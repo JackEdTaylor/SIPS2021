@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>03 - Multiple Control Variables</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-sm-12 col-md-4 col-lg-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-sm-12 col-md-8 col-lg-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">SIPS 2021: Matching Stimuli</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="distribution-wise.html">Distribution-Wise Matching</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">03 - Multiple Control Variables</h1>
+
+</div>
+
+
+<p>In this example, let’s match on more than one control variable, but also weight the control variables by how important we think it is that they be matched. We’ll use the same design as in <a href="dw_03_multiple_controls.html">03 - Multiple Control Variables</a> and control for three variables simultaneously: <code>face_width</code>, <code>face_length</code>, and <code>task_rt</code>. This time, however, we’ll weight overlapping index values by the importance of each control variable.</p>
+<div id="setup" class="section level1">
+<h1>Setup</h1>
+<div id="load-packages" class="section level2">
+<h2>Load Packages</h2>
+<pre class="r"><code>library(tidyverse)
+library(overlapping)  # contains function for calculating overlap index</code></pre>
+</div>
+<div id="import-the-data" class="section level2">
+<h2>Import the Data</h2>
+<pre class="r"><code>stim_pool &lt;- read_csv(&quot;stim_pool.csv&quot;)</code></pre>
+</div>
+</div>
+<div id="matching-using-multiple-controls" class="section level1">
+<h1>Matching Using Multiple Controls</h1>
+<p>As mentioned, we’ll again create a list of 100 young and 100 old faces. We’re matching on face width, face length, and response time on a task (<code>task_rt</code>). Importantly, this time we’re weighting overlap index values by their relative importance.</p>
+<div id="step-1-identify-conditions" class="section level3">
+<h3><strong>Step 1</strong>: Identify conditions</h3>
+<p>First, we define our conditions. We’ll use the same conditions as in <a href="dw_01_max_distributional_overlap.html">01 - Maximising Distributional Overlap</a>.</p>
+<pre class="r"><code>stim_pool &lt;- mutate(stim_pool, cond = case_when(age&lt;28 ~ &quot;young&quot;, age&gt;50 ~ &quot;old&quot;))</code></pre>
+</div>
+<div id="step-2-create-a-vector-of-seeds" class="section level3">
+<h3><strong>Step 2</strong>: Create a vector of seeds</h3>
+<p>As before, we’ll create a vector of a large number of random seeds so we can reproduce our stimulus sets. For speed, I’m only running 1000 iterations in this example, but I recommend running much larger numbers of iterations to improve the quality of the match.</p>
+<pre class="r"><code>set.seed(42)  # comment this line out (put # at the start of the line) to get a different result to mine
+n_iter &lt;- 2
+seeds &lt;- sample(1:.Machine$integer.max, n_iter)</code></pre>
+</div>
+<div id="step-3-identify-the-control-variables" class="section level3">
+<h3><strong>Step 3</strong>: Identify the Control Variables</h3>
+<p>We’ll create a vector of the column names for the variables we want to control for. We’ll use this to loop over the control variables.</p>
+<pre class="r"><code>control_vars &lt;- c(&quot;face_width&quot;, &quot;face_length&quot;, &quot;task_rt&quot;)</code></pre>
+</div>
+<div id="step-4-simulate-a-large-number-of-samples" class="section level3">
+<h3><strong>Step 4</strong>: Simulate a large number of samples</h3>
+<p>As before, we want to simulate a large number of random samples. Again, we’re recording distributional overlap on three different control variables. To do this, we can just use a nested <code>sapply()</code> loop.</p>
+<pre class="r"><code>res &lt;- map_df(seeds, function(seed_i) {
+  # set the seed, so we can recreate any sample later
+  set.seed(seed_i)
+  
+  sample &lt;- stim_pool %&gt;%
+    # only keep observations from conditions we are interested in (remove faces from ages 29 to 49)
+    filter(cond %in% c(&quot;young&quot;, &quot;old&quot;)) %&gt;%
+    # for each condition, randomly select 100 items
+    group_by(cond) %&gt;%
+    slice_sample(n = 100)
+  
+  # for each control variable, record the overlap between the two conditions
+  control_ov &lt;- sapply(control_vars, function(var_i) {
+    # get the values for this control variable for the young condition
+    var_i_young &lt;-  sample %&gt;%
+      filter(cond == &quot;young&quot;) %&gt;%
+      pull(!!var_i)
+    
+    # get the values for this control variable for the old condition
+    var_i_old &lt;-  sample %&gt;%
+      filter(cond == &quot;old&quot;) %&gt;%
+      pull(!!var_i)
+    
+    # get the degree of overlap on the control variable between the two samples
+    ov_results &lt;- overlapping::overlap(list(var_i_young, var_i_old))
+    
+    # extract the actual value for the degree of overlap
+    ov_results$OV
+  })
+  
+  # return a dataframe with the overlap for the three control variables
+  tibble(seed = seed_i, control = control_vars, ov = control_ov)
+})</code></pre>
+</div>
+<div id="step-5-calculate-overall-overlap" class="section level3">
+<h3><strong>Step 5</strong>: Calculate overall overlap</h3>
+<p>Now we can calculate the average overlap for each seed. This time, we’re weighting this average differently for each control variable. Let’s imagine we decide that controlling for face width and face length is three times more important than controlling for task response time.</p>
+<p>As a first step, I create a table which will let us look up the weight for each control variable. Since we don’t care about scaling the weighted average (the maximum will always be the maximum value), we don’t have to worry about scaling the weights, so we can just use <code>c(3, 3, 1)</code> to reflect that <code>face_width</code> and <code>face_length</code> are three times more important than <code>task_rt</code>.</p>
+<pre class="r"><code>control_weights &lt;- tibble(
+  control = c(&quot;face_width&quot;, &quot;face_length&quot;, &quot;task_rt&quot;),
+  weight = c(20, 20, 1)
+)</code></pre>
+<p>We can now join these weights to our results (using a <a href="https://dplyr.tidyverse.org/reference/join.html"><code>dplyr</code> join function</a>), calculate the weighted overlap index (<code>ov_weighted</code>), and then calculate the average overlap index on these weighted values.</p>
+<pre class="r"><code>res_summ &lt;- res %&gt;%
+  left_join(control_weights, by=&quot;control&quot;) %&gt;%
+  mutate(ov_weighted = ov * weight) %&gt;%
+  group_by(seed) %&gt;%
+  summarise(mean_ov_weighted = mean(ov_weighted))</code></pre>
+</div>
+<div id="step-6-check-the-results" class="section level3">
+<h3><strong>Step 6</strong>: Check the results</h3>
+<p>We can now check the distribution of <code>mean_ov_weighted</code>. Since we didn’t scale our weights, the average is no longer bounded between 0 and 1. However, the best match is still the sample with the highest number.</p>
+<pre class="r"><code>ggplot(res_summ, aes(mean_ov_weighted)) +
+  geom_density() +
+  geom_point(aes(y = -0.5), position = position_jitter(height=0.5)) +
+  xlab(&quot;Mean Overlapping Index&quot;)</code></pre>
+<p><img src="dw_99_weighting_controls_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="step-7-find-the-best-stimulus-set" class="section level3">
+<h3><strong>Step 7</strong>: Find the best stimulus set</h3>
+<p>We can now sort the results by mean weighted overlapping index (descendingly) to order them by how well-matched the conditions are.</p>
+<pre class="r"><code>res_sorted &lt;- arrange(res_summ, desc(mean_ov_weighted))
+
+res_sorted</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##         seed mean_ov_weighted
+##        &lt;int&gt;            &lt;dbl&gt;
+## 1 1228985497             11.4
+## 2 1781592037             11.2</code></pre>
+<p>Now we can just extract the best seed as that which has the highest overlapping index.</p>
+<pre class="r"><code># sort by distance ascendingly, so the best seed is at the top, and extract it
+best_seed &lt;- res_sorted %&gt;%
+  pull(seed) %&gt;%
+  first()
+
+best_seed</code></pre>
+<pre><code>## [1] 1228985497</code></pre>
+</div>
+<div id="step-8-recreate-the-best-stimulus-set" class="section level3">
+<h3><strong>Step 8</strong>: Recreate the best stimulus set</h3>
+<p>Now we know that <em>1228985497</em> is the best seed, we can use that seed to recreate the stimulus set. This code needs to be identical to our simulation code to ensure we recreate the exact same stimulus set.</p>
+<pre class="r"><code>set.seed(best_seed)
+  
+best_stim &lt;- stim_pool %&gt;%
+  filter(cond %in% c(&quot;young&quot;, &quot;old&quot;)) %&gt;%
+  group_by(cond) %&gt;%
+  slice_sample(n = 100)</code></pre>
+<p>To prove that the stimuli are well-matched, here is what the distribution of each control variable looks like in each condition:</p>
+<pre class="r"><code>best_stim %&gt;%
+  pivot_longer(all_of(control_vars), names_to=&quot;control&quot;, values_to=&quot;control_value&quot;) %&gt;%
+  ggplot(aes(control_value, colour=cond, fill=cond)) +
+  geom_density(alpha=0.4) +
+  facet_wrap(vars(control), scales=&quot;free&quot;)</code></pre>
+<p><img src="dw_99_weighting_controls_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>We could use the faces in <code>best_stim</code> for our experiment, and be fairly sure that we’ve controlled for face width.</p>
+<p>For comparison, here is what the worst stimulus set looks like:</p>
+<pre class="r"><code># sort ascendingly (smallest overlap first), and extract the top seed
+worst_seed &lt;- res_sorted %&gt;%
+  arrange(mean_ov_weighted) %&gt;%
+  pull(seed) %&gt;%
+  first()
+
+set.seed(worst_seed)
+
+# recreate the worst stimulus set
+worst_stim &lt;- stim_pool %&gt;%
+  filter(cond %in% c(&quot;young&quot;, &quot;old&quot;)) %&gt;%
+  group_by(cond) %&gt;%
+  slice_sample(n = 100)
+
+worst_stim %&gt;%
+  pivot_longer(control_vars, names_to=&quot;control&quot;, values_to=&quot;control_value&quot;) %&gt;%
+  ggplot(aes(control_value, colour=cond, fill=cond)) +
+  geom_density(alpha=0.4) +
+  facet_wrap(vars(control), scales=&quot;free&quot;)</code></pre>
+<pre><code>## Note: Using an external vector in selections is ambiguous.
+## i Use `all_of(control_vars)` instead of `control_vars` to silence this message.
+## i See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.
+## This message is displayed once per session.</code></pre>
+<p><img src="dw_99_weighting_controls_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
