@@ -1,4 +1,5 @@
 name: "SIPS2021"
+output_dir: "docs"
 output:
   html_document:
     css: "style.css"
