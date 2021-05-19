@@ -1,0 +1,11 @@
+name: "SIPS2021"
+output:
+  html_document:
+    css: "style.css"
+navbar:
+  title: "SIPS 2021: Matching Stimuli"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Distribution-Wise Matching"
+      href: distribution-wise.html
