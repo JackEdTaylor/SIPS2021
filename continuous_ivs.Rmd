@@ -1,0 +1,51 @@
+---
+title: "Continuous Independent Variables"
+---
+
+```{r, incude=FALSE, echo=FALSE, message=FALSE}
+library(fontawesome)
+```
+
+Rather than needlessly dichotomise or bin your stimuli, you might want to look at the effect of a continuous variable, while controlling for a confounding variable. For example, rather than comparing young, middle-aged, and old faces in a face-judgement task, you might want to vary age continuously. One solution could be minimising mutual information. Just as distribution-wise matching does not assume a distributional shape (e.g., normal distribution), mutual information does not assume anything about the shape of the relationship (e.g., linearity).
+
+<br>
+
+![](img/continuous_ivs.png)
+
+<br>
+
+Mutual information is a measure of how much information two variables have in common. If we minimise the mutual information between an independent variable (e.g., age) and a control variable (e.g., face width, face height), we can reduce the impact of the control variable on our outcome.
+
+I've just written one short example showing how you might minimise mutual information.
+
+The code uses the `infotheo` package to calculate mutual information. You can install `infotheo` with:
+
+```{r, eval=FALSE}
+install.packages("infotheo")
+```
+
+<br>
+
+```{r, echo=FALSE, message=FALSE}
+library(tibble)
+library(dplyr)
+library(kableExtra)
+
+# function which translates y/n values into latex symbols for tick and cross
+tickcross <- function(x, tick="y", cross="n") ifelse(x==tick, "$\\checkmark$", ifelse(x==cross, "$\\mathbf{\\times}$", "?"))
+
+tribble(
+  ~`Title/Link`, ~`No. Conditions`, ~`No. Control Variables`,
+  "[01 - Minimising Mutual Information](c_01_minimising_mi.html)", 2, 1
+) %>%
+  knitr::kable(align = c("l", "c", "c")) %>%
+  kable_styling() %>%
+  column_spec(1, width="50%")
+```
+
+```{r, echo=FALSE, message=FALSE}
+# create a zip folder of all the RMarkdown examples
+zip("continuous_ivs.zip", list.files(pattern = "^c_\\d{2}_.+\\.Rmd$"))
+```
+
+[`r fa(name = "download")` Download code for all examples](continuous_ivs.zip)

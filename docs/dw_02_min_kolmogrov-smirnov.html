@@ -323,6 +323,12 @@ div.tocify {
 <li>
   <a href="distribution-wise.html">Distribution-Wise Matching</a>
 </li>
+<li>
+  <a href="item-wise.html">Item-Wise Matching</a>
+</li>
+<li>
+  <a href="continuous_ivs.html">Continuous IVs</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -461,13 +467,13 @@ best_stim &lt;- stim_pool %&gt;%
   filter(cond %in% c(&quot;young&quot;, &quot;old&quot;)) %&gt;%
   group_by(cond) %&gt;%
   slice_sample(n = 100)</code></pre>
-<p>To prove that the stimuli are well-matched face width, here is what the distribution of <code>face_width</code> looks like for each condition:</p>
+<p>To prove that the stimuli are well-matched on face width, here is what the distribution of <code>face_width</code> looks like for each condition:</p>
 <pre class="r"><code>ggplot(best_stim, aes(face_width, colour=cond, fill=cond)) +
   geom_density(alpha=0.4)</code></pre>
 <p><img src="dw_02_min_kolmogrov-smirnov_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>We could use the faces in <code>best_stim</code> for our experiment, and be fairly sure that we’ve controlled for face width.</p>
 <p>For comparison, here is what the worst stimulus set looks like:</p>
-<pre class="r"><code># sort ascendingly (largest K-S statistic first), and extract the top seed
+<pre class="r"><code># sort descedningly (smallest K-S statistic first), and extract the top seed
 worst_seed &lt;- res_sorted %&gt;%
   arrange(desc(ks)) %&gt;%
   pull(seed) %&gt;%

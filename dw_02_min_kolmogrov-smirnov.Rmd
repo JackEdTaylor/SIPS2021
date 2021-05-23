@@ -11,8 +11,8 @@ In this example, I show how you can match two conditions on the distribution of 
 For comparison, the code here is very similar to that in `01_max_distributional_overlap.Rmd`.
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev.args = list(png = list(type = "cairo")))
 ggplot2::theme_set(ggplot2::theme_bw())
-knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Setup
@@ -146,7 +146,7 @@ best_stim <- stim_pool %>%
   slice_sample(n = 100)
 ```
 
-To prove that the stimuli are well-matched face width, here is what the distribution of `face_width` looks like for each condition:
+To prove that the stimuli are well-matched on face width, here is what the distribution of `face_width` looks like for each condition:
 
 ```{r}
 ggplot(best_stim, aes(face_width, colour=cond, fill=cond)) +
@@ -158,7 +158,7 @@ We could use the faces in `best_stim` for our experiment, and be fairly sure tha
 For comparison, here is what the worst stimulus set looks like:
 
 ```{r}
-# sort ascendingly (largest K-S statistic first), and extract the top seed
+# sort descedningly (smallest K-S statistic first), and extract the top seed
 worst_seed <- res_sorted %>%
   arrange(desc(ks)) %>%
   pull(seed) %>%

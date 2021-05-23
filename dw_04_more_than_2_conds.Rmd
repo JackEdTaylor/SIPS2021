@@ -9,8 +9,8 @@ output:
 In the previous example, we matched control variables across two conditions. In this example, we'll match control variables across three conditions. This could also be applied to an interactive design (e.g. matching four conditions in a 2x2 design). Rather than comparing young and old faces, we'll have a design comparing young, middle-aged, and old faces. The three variables we're controlling for are: `face_width`, `face_length`, and `task_rt`. We'll match for variables using the Overlapping Index (although we could use other statistics if we wanted).
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev.args = list(png = list(type = "cairo")))
 ggplot2::theme_set(ggplot2::theme_bw())
-knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Setup

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>08 - Item-Wise Matching from Scratch</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-sm-12 col-md-4 col-lg-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-sm-12 col-md-8 col-lg-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">SIPS 2021: Matching Stimuli</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="distribution-wise.html">Distribution-Wise Matching</a>
+</li>
+<li>
+  <a href="item-wise.html">Item-Wise Matching</a>
+</li>
+<li>
+  <a href="continuous_ivs.html">Continuous IVs</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">08 - Item-Wise Matching from Scratch</h1>
+
+</div>
+
+
+<p>In all the previous examples, I use LexOPS to match item-wise. In this example, I show code for item-wise matching without using LexOPS. The idea is to show how item-wise matching with tolerances actually works.</p>
+<p>As a simple example, we’ll recreate the design from <a href="iw_01_item-wise.html">01 - Item-Wise Matching</a> using hand-written code.</p>
+<div id="setup" class="section level1">
+<h1>Setup</h1>
+<div id="load-packages" class="section level2">
+<h2>Load Packages</h2>
+<pre class="r"><code>library(tidyverse)</code></pre>
+</div>
+<div id="import-the-data" class="section level2">
+<h2>Import the Data</h2>
+<pre class="r"><code>stim_pool &lt;- read_csv(&quot;stim_pool.csv&quot;)</code></pre>
+</div>
+</div>
+<div id="item-wise-matching-from-scratch" class="section level1">
+<h1>Item-Wise Matching from Scratch</h1>
+<p>Let’s create a list of 100 young and 100 old faces, matched on face width.</p>
+<div id="step-1-identify-conditions" class="section level3">
+<h3><strong>Step 1</strong>: Identify conditions</h3>
+<p>First, we define our conditions. Let’s say young faces are &lt;28 years old, and old faces are &gt;50 years old. We can use dplyr’s <code>mutate()</code> and <code>case_when()</code> to create our conditions.</p>
+<pre class="r"><code>stim_pool &lt;- mutate(stim_pool, cond = case_when(age&lt;28 ~ &quot;young&quot;, age&gt;50 ~ &quot;old&quot;))</code></pre>
+<p>This gives us &gt;1000 candidate items for each of our conditions.</p>
+<pre class="r"><code>count(stim_pool, cond)</code></pre>
+<pre><code>## # A tibble: 3 x 2
+##   cond      n
+##   &lt;chr&gt; &lt;int&gt;
+## 1 old    1116
+## 2 young  1202
+## 3 &lt;NA&gt;   2682</code></pre>
+</div>
+<div id="step-2-decide-on-tolerance" class="section level3">
+<h3><strong>Step 2</strong>: Decide on Tolerance</h3>
+<p>The first step is to decide how <em>closely</em> we want to match face width. Let’s imagine that we decide to match face width within ±0.5 pixels. For reference later, we’ll store this in a vector:</p>
+<pre class="r"><code>tol &lt;- c(-0.5, 0.5)</code></pre>
+</div>
+<div id="step-3-find-matches" class="section level3">
+<h3><strong>Step 3</strong>: Find Matches</h3>
+<p>Here is the code for finding 100 pairs of young and old faces matched for face width.</p>
+<p>On each iteration, we:</p>
+<ol style="list-style-type: decimal">
+<li>Get a list of all candidate faces which haven’t already been selected.</li>
+<li>Pick a random item from the young condition.</li>
+<li>Try pick a random item from the old condition which is suitably close (within ±0.5 face width).</li>
+<li>If there was no suitable match, skip to the next iteration. Otherwise, record the match.</li>
+</ol>
+<p>We keep going until we have <code>n_stim</code> (100) matched pairs. To do this, we can use a <code>while</code> loop. Normally you would also want to add <code>break</code> statements to handle cases when the method fails, but I’ve left these out for now to keep the code simple.</p>
+<p>This will give us a list of matched pairs in the form <code>list(c("stim_42", "stim_54"), c("stim_972", "stim_43"))</code>, of length 100.</p>
+<pre class="r"><code># number of stimuli we want
+n_stim &lt;- 100
+
+# the conditions we&#39;re interested in
+age_conds &lt;- c(&quot;young&quot;, &quot;old&quot;)
+
+# keep track of how many matches have been found
+n_found &lt;- 0
+matches &lt;- list()
+
+while (n_found &lt; n_stim) {
+  # 1. filter the pool to exclude items already matched
+  iter_pool &lt;- filter(stim_pool, !stim_id %in% unlist(matches))
+  
+  # 2. pick a cond_i item at random, and get it&#39;s data
+  young_item &lt;- iter_pool %&gt;%
+    filter(cond == &quot;young&quot;) %&gt;%
+    slice_sample(n = 1)
+  
+  # 3. filter the pool to find an item suitably close to the match null
+  old_item &lt;- iter_pool %&gt;%
+    filter(
+      cond == &quot;old&quot;,
+      face_width &gt;= young_item$face_width + tol[1],
+      face_width &lt;= young_item$face_width + tol[2]
+    ) %&gt;%
+    slice_sample(n = 1)
+  
+  # 4. if no suitable match, end the iteration...
+  if (nrow(old_item) == 0) next
+  
+  # ...otherwise, record the match
+  matches[[length(matches) + 1]] &lt;- c(young = young_item$stim_id, old = old_item$stim_id)
+  n_found &lt;- n_found + 1
+}</code></pre>
+</div>
+<div id="step-4-check-stimuli" class="section level3">
+<h3><strong>Step 4</strong>: Check Stimuli</h3>
+<p>Now we have a list of all the matched pairs, we can put this in a dataframe like so .</p>
+<pre class="r"><code>match_df &lt;- map_df(1:length(matches), function(i) {
+  tibble(
+    pair_nr = i,
+    young = matches[[i]][&quot;young&quot;],
+    old = matches[[i]][&quot;old&quot;]
+  )
+})
+
+match_df</code></pre>
+<pre><code>## # A tibble: 100 x 3
+##    pair_nr young     old      
+##      &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;    
+##  1       1 face_2398 face_1490
+##  2       2 face_169  face_4147
+##  3       3 face_1637 face_911 
+##  4       4 face_1656 face_3414
+##  5       5 face_2181 face_3664
+##  6       6 face_4674 face_295 
+##  7       7 face_553  face_1295
+##  8       8 face_1548 face_601 
+##  9       9 face_1982 face_2997
+## 10      10 face_1702 face_4455
+## # ... with 90 more rows</code></pre>
+<p>We can add to this the face width values associated with each young and old item, and calculate the difference.</p>
+<pre class="r"><code>stim_pool_young &lt;- stim_pool %&gt;%
+  rename(face_width_young = face_width) %&gt;%
+  select(stim_id, face_width_young)
+
+stim_pool_old &lt;- stim_pool %&gt;%
+  rename(face_width_old = face_width) %&gt;%
+  select(stim_id, face_width_old)
+
+match_df &lt;- match_df %&gt;%
+  left_join(stim_pool_young, by=c(&quot;young&quot; = &quot;stim_id&quot;))  %&gt;%
+  left_join(stim_pool_old, by=c(&quot;old&quot; = &quot;stim_id&quot;)) %&gt;%
+  mutate(face_width_diff = face_width_young - face_width_old)
+
+match_df</code></pre>
+<pre><code>## # A tibble: 100 x 6
+##    pair_nr young     old       face_width_young face_width_old face_width_diff
+##      &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;                &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;
+##  1       1 face_2398 face_1490             65.6           65.5           0.140
+##  2       2 face_169  face_4147             59.8           60.0          -0.180
+##  3       3 face_1637 face_911              63.2           63.6          -0.400
+##  4       4 face_1656 face_3414             68.2           68.4          -0.190
+##  5       5 face_2181 face_3664             61.6           61.8          -0.200
+##  6       6 face_4674 face_295              67.4           67             0.450
+##  7       7 face_553  face_1295             60.0           59.8           0.200
+##  8       8 face_1548 face_601              66.5           66.9          -0.410
+##  9       9 face_1982 face_2997             61.0           60.8           0.150
+## 10      10 face_1702 face_4455             60.4           60.7          -0.310
+## # ... with 90 more rows</code></pre>
+<p>Here is the distribution of differences between the young and old faces. Notice that they are between -0.5 and 0.5.</p>
+<pre class="r"><code>match_df %&gt;%
+  ggplot(aes(face_width_diff)) +
+  geom_histogram(binwidth = 0.1) +
+  scale_x_continuous(n.breaks=10)</code></pre>
+<p><img src="iw_08_from_scratch_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>We can also create a plot similar to <code>plot_design()</code> to show the distributional similarity at the same time:</p>
+<pre class="r"><code>match_df %&gt;%
+  select(young, old, pair_nr) %&gt;%
+  pivot_longer(c(young, old), names_to=&quot;cond&quot;, values_to=&quot;stim_id&quot;) %&gt;%
+  left_join(select(stim_pool, stim_id, face_width), by=&quot;stim_id&quot;) %&gt;%
+  ggplot(aes(cond, face_width)) +
+  geom_violin() +
+  geom_point() +
+  geom_line(aes(group = pair_nr))</code></pre>
+<p><img src="iw_08_from_scratch_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>I decided to write LexOPS because it lets you match items with readable and easily editable code, but as you can see the method is actually very simple! You could adapt the code written here to create any stimuli you could create with LexOPS, including the other examples provided.</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

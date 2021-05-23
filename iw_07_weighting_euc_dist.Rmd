@@ -1,0 +1,82 @@
+---
+title: "07 - Weighting Euclidean Distance"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+In [06 - Matching in Euclidean Distance](iw_06_euclidean_dist.html), we saw how you can match multiple numeric variables by Euclidean distance. However, you might still want to match some of those variables more closely than others. We can do this with weights.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev.args = list(png = list(type = "cairo")))
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+# Setup
+
+## Load Packages
+
+```{r, message=FALSE}
+library(tidyverse)
+library(LexOPS)  # package with functions for item-wise matching
+```
+
+## Import the Data
+
+```{r, message=FALSE}
+stim_pool <- read_csv("stim_pool.csv")
+```
+
+# Matching in Euclidean Distance
+
+### **Step 1**: Find Matches
+
+As in [06 - Matching in Euclidean Distance](iw_06_euclidean_dist.html), we'll match face width, face length, and task response time in Euclidean space. However, we decide that we want to weight these controls differentially, because some are more important to match than others. Specifically, we decide that:
+
+* Face width is the most important variable to match
+* Face length is kind of important to match
+* Task response time is useful to match, but least important
+
+We can pass weights, reflecting the relative importance of the controls, to `control_for_euc()`. These weights should be a vector of numbers in the same order as the variables given as controls. Importantly, it's the relative sizes of the weights that matters - they will be automatically scaled by LexOPS so we don't have to change our overall tolerance (`-0.5:0.5`).
+
+```{r}
+stim <- stim_pool %>%
+  set_options(id_col = "stim_id") %>%
+  # create the three levels of age
+  split_by(age, 1:28 ~ 35:45 ~ 50:100) %>%
+  # control for all variables
+  control_for_euc(c(face_width, face_length, task_rt), -0.5:0.5, weights = c(10, 5, 2)) %>%
+  control_for(gender) %>%
+  generate(n=100, seed=42, match_null="inclusive")
+```
+
+As before, this gives us a list of matched triplets of young, middle-aged, and old faces. Each row has a young face `A1`, a middle-aged face `A2`, and an old face `A3`.
+
+```{r, eval=FALSE}
+stim
+```
+
+```{r, echo=FALSE}
+as_tibble(stim)
+```
+
+### **Step 2**: Check Stimuli
+
+We can check the values for each item with `long_format()`:
+
+```{r, eval=FALSE}
+long_format(stim)
+```
+
+```{r, echo=FALSE}
+as_tibble(long_format(stim))
+```
+
+To check the matching of the variables that the Euclidean distance is calculated from, we can pass the variables to `plot_design()`:
+
+```{r}
+plot_design(stim, c("face_width", "face_length", "task_rt"))
+```
+
+As you can see, this time the precision with which the three variables are matched reflects the relative sizes of the weights we gave, where face width is matched very closely, face length is matched quite closely, and task response time is matched very loosely.

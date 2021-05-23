@@ -10,3 +10,7 @@ navbar:
       href: index.html
     - text: "Distribution-Wise Matching"
       href: distribution-wise.html
+    - text: "Item-Wise Matching"
+      href: item-wise.html
+    - text: "Continuous IVs"
+      href: continuous_ivs.html

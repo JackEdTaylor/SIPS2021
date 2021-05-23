@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>04 - Setting the Match Null</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-sm-12 col-md-4 col-lg-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-sm-12 col-md-8 col-lg-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">SIPS 2021: Matching Stimuli</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="distribution-wise.html">Distribution-Wise Matching</a>
+</li>
+<li>
+  <a href="item-wise.html">Item-Wise Matching</a>
+</li>
+<li>
+  <a href="continuous_ivs.html">Continuous IVs</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">04 - Setting the Match Null</h1>
+
+</div>
+
+
+<p>In <a href="iw_03_more_than_2_conds.html">03 - &gt;2 Conditions</a>, we matched three conditions by multiple variables. This might sometimes have unexpected effects, however. To explain why, we need to look at match nulls.</p>
+<div id="setup" class="section level1">
+<h1>Setup</h1>
+<div id="load-packages" class="section level2">
+<h2>Load Packages</h2>
+<pre class="r"><code>library(tidyverse)
+library(LexOPS)  # package with functions for item-wise matching</code></pre>
+</div>
+<div id="import-the-data" class="section level2">
+<h2>Import the Data</h2>
+<pre class="r"><code>stim_pool &lt;- read_csv(&quot;stim_pool.csv&quot;)</code></pre>
+</div>
+</div>
+<div id="using-the-default-match-null" class="section level1">
+<h1>Using the Default Match Null</h1>
+<p>In <a href="iw_03_more_than_2_conds.html">03 - &gt;2 Conditions</a>, we matched three conditions on multiple control variables. Here is a recreation of those stimuli:</p>
+<pre class="r"><code>stim1 &lt;- stim_pool %&gt;%
+  set_options(id_col = &quot;stim_id&quot;) %&gt;%
+  split_by(age, 1:28 ~ 35:45 ~ 50:100) %&gt;%
+  control_for(face_width, -0.5:0.5) %&gt;%
+  control_for(face_length, -2:2) %&gt;%
+  control_for(task_rt, -25:25) %&gt;%
+  control_for(gender) %&gt;%
+  generate(n=100, seed=42)</code></pre>
+<pre><code>## Generated 5/100 (5%). 9 total iterations, 0.56 success rate.
+Generated 10/100 (10%). 15 total iterations, 0.67 success rate.
+Generated 15/100 (15%). 21 total iterations, 0.71 success rate.
+Generated 20/100 (20%). 26 total iterations, 0.77 success rate.
+Generated 25/100 (25%). 36 total iterations, 0.69 success rate.
+Generated 30/100 (30%). 44 total iterations, 0.68 success rate.
+Generated 35/100 (35%). 51 total iterations, 0.69 success rate.
+Generated 40/100 (40%). 68 total iterations, 0.59 success rate.
+Generated 45/100 (45%). 74 total iterations, 0.61 success rate.
+Generated 50/100 (50%). 83 total iterations, 0.60 success rate.
+Generated 55/100 (55%). 92 total iterations, 0.60 success rate.
+Generated 60/100 (60%). 98 total iterations, 0.61 success rate.
+Generated 65/100 (65%). 105 total iterations, 0.62 success rate.
+Generated 70/100 (70%). 116 total iterations, 0.60 success rate.
+Generated 75/100 (75%). 122 total iterations, 0.61 success rate.
+Generated 80/100 (80%). 133 total iterations, 0.60 success rate.
+Generated 85/100 (85%). 143 total iterations, 0.59 success rate.
+Generated 90/100 (90%). 149 total iterations, 0.60 success rate.
+Generated 95/100 (95%). 159 total iterations, 0.60 success rate.
+Generated 100/100 (100%). 169 total iterations, 0.59 success rate.</code></pre>
+<p>This gives us the following result - notice the <code>match_null</code> column at the end. Each row has a different match null, one of the three conditions, which dictates which condition the other conditions are matched to. For example, for the first matched row, the conditions A2 and A3 are matched to condition A1.</p>
+<pre class="r"><code>stim1</code></pre>
+<pre><code>## # A tibble: 100 x 5
+##    item_nr A1        A2        A3        match_null
+##      &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;     
+##  1       1 face_4884 face_1865 face_2334 A1        
+##  2       2 face_3851 face_740  face_3854 A3        
+##  3       3 face_3301 face_160  face_4826 A2        
+##  4       4 face_2181 face_1713 face_2558 A1        
+##  5       5 face_3282 face_3330 face_1218 A3        
+##  6       6 face_341  face_3098 face_4026 A2        
+##  7       7 face_121  face_3052 face_3084 A3        
+##  8       8 face_1817 face_720  face_3491 A3        
+##  9       9 face_1243 face_4788 face_1334 A1        
+## 10      10 face_4854 face_3816 face_2268 A3        
+## # ... with 90 more rows</code></pre>
+<p>By default, matching will be done in a <em>balanced</em> way, where a match null is pseudo-randomly chosen from the possible conditions, but with equal frequency in the final stimuli. This approach makes a lot of sense, but might give some unexpected results.</p>
+<p>As an example, imagine we set a tolerance of <code>-1:1</code>. The match null for a given item is A1, so A2 and A3 will be within ±1 of the item for condition A1. The problem is that A2 could equal A1-1, and A3 could be A1+1. This means that A2 and A3 could have a difference of up to ±2. If you have a tolerance of <code>-1:1</code>, you might want A2 and A3 to also be matched within ±1.</p>
+<p>The solution is to set the match null to “inclusive”.</p>
+</div>
+<div id="using-inclusive-match-nulls" class="section level1">
+<h1>Using Inclusive Match Nulls</h1>
+<p>If you want each condition to be matched to every other condition within your tolerance, you need to use an inclusive match null. You can do this by setting the <code>match_null</code> argument in <code>generate()</code>:</p>
+<pre class="r"><code>stim2 &lt;- stim_pool %&gt;%
+  set_options(id_col = &quot;stim_id&quot;) %&gt;%
+  split_by(age, 1:28 ~ 35:45 ~ 50:100) %&gt;%
+  control_for(face_width, -0.5:0.5) %&gt;%
+  control_for(face_length, -2:2) %&gt;%
+  control_for(task_rt, -25:25) %&gt;%
+  control_for(gender) %&gt;%
+  generate(n=100, seed=42, match_null=&quot;inclusive&quot;)</code></pre>
+<pre><code>## Generated 5/100 (5%). 18 total iterations, 0.28 success rate.
+Generated 10/100 (10%). 28 total iterations, 0.36 success rate.
+Generated 15/100 (15%). 41 total iterations, 0.37 success rate.
+Generated 20/100 (20%). 52 total iterations, 0.38 success rate.
+Generated 25/100 (25%). 66 total iterations, 0.38 success rate.
+Generated 30/100 (30%). 87 total iterations, 0.34 success rate.
+Generated 35/100 (35%). 95 total iterations, 0.37 success rate.
+Generated 40/100 (40%). 116 total iterations, 0.34 success rate.
+Generated 45/100 (45%). 132 total iterations, 0.34 success rate.
+Generated 50/100 (50%). 147 total iterations, 0.34 success rate.
+Generated 55/100 (55%). 165 total iterations, 0.33 success rate.
+Generated 60/100 (60%). 197 total iterations, 0.30 success rate.
+Generated 65/100 (65%). 236 total iterations, 0.28 success rate.
+Generated 70/100 (70%). 258 total iterations, 0.27 success rate.
+Generated 75/100 (75%). 270 total iterations, 0.28 success rate.
+Generated 80/100 (80%). 300 total iterations, 0.27 success rate.
+Generated 85/100 (85%). 328 total iterations, 0.26 success rate.
+Generated 90/100 (90%). 347 total iterations, 0.26 success rate.
+Generated 95/100 (95%). 377 total iterations, 0.25 success rate.
+Generated 100/100 (100%). 406 total iterations, 0.25 success rate.</code></pre>
+<p>This time, the <code>match_null</code> column will all equal <code>NA</code>, because every condition is matched to every other condition.</p>
+<pre class="r"><code>stim2</code></pre>
+<pre><code>## # A tibble: 100 x 5
+##    item_nr A1        A2        A3        match_null
+##      &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;     
+##  1       1 face_2897 face_4923 face_779  &lt;NA&gt;      
+##  2       2 face_337  face_4709 face_2957 &lt;NA&gt;      
+##  3       3 face_3946 face_3317 face_637  &lt;NA&gt;      
+##  4       4 face_1081 face_1984 face_3014 &lt;NA&gt;      
+##  5       5 face_1044 face_4701 face_3354 &lt;NA&gt;      
+##  6       6 face_3059 face_2313 face_4200 &lt;NA&gt;      
+##  7       7 face_2596 face_4752 face_4156 &lt;NA&gt;      
+##  8       8 face_3172 face_1579 face_3653 &lt;NA&gt;      
+##  9       9 face_4240 face_3644 face_3247 &lt;NA&gt;      
+## 10      10 face_1312 face_1629 face_765  &lt;NA&gt;      
+## # ... with 90 more rows</code></pre>
+</div>
+<div id="using-conditions-as-match-nulls" class="section level1">
+<h1>Using Conditions as Match Nulls</h1>
+<p>On the other hand, you may have a design where you wish to use the same match null for each matched set. For example, you might want to treat faces as a null in your experimental design, and wish for a set of young faces matched to middle-aged faces, and a list of older faces matched to the same items. You can do this by giving a specific condition to the <code>match_null</code> argument of <code>generate()</code>:</p>
+<pre class="r"><code>stim3 &lt;- stim_pool %&gt;%
+  set_options(id_col = &quot;stim_id&quot;) %&gt;%
+  split_by(age, 1:28 ~ 35:45 ~ 50:100) %&gt;%
+  control_for(face_width, -0.5:0.5) %&gt;%
+  control_for(face_length, -2:2) %&gt;%
+  control_for(task_rt, -25:25) %&gt;%
+  control_for(gender) %&gt;%
+  generate(n=100, seed=42, match_null=&quot;A2&quot;)</code></pre>
+<pre><code>## Generated 5/100 (5%). 10 total iterations, 0.50 success rate.
+Generated 10/100 (10%). 16 total iterations, 0.62 success rate.
+Generated 15/100 (15%). 25 total iterations, 0.60 success rate.
+Generated 20/100 (20%). 34 total iterations, 0.59 success rate.
+Generated 25/100 (25%). 44 total iterations, 0.57 success rate.
+Generated 30/100 (30%). 53 total iterations, 0.57 success rate.
+Generated 35/100 (35%). 58 total iterations, 0.60 success rate.
+Generated 40/100 (40%). 66 total iterations, 0.61 success rate.
+Generated 45/100 (45%). 73 total iterations, 0.62 success rate.
+Generated 50/100 (50%). 82 total iterations, 0.61 success rate.
+Generated 55/100 (55%). 87 total iterations, 0.63 success rate.
+Generated 60/100 (60%). 101 total iterations, 0.59 success rate.
+Generated 65/100 (65%). 110 total iterations, 0.59 success rate.
+Generated 70/100 (70%). 127 total iterations, 0.55 success rate.
+Generated 75/100 (75%). 135 total iterations, 0.56 success rate.
+Generated 80/100 (80%). 145 total iterations, 0.55 success rate.
+Generated 85/100 (85%). 155 total iterations, 0.55 success rate.
+Generated 90/100 (90%). 166 total iterations, 0.54 success rate.
+Generated 95/100 (95%). 171 total iterations, 0.56 success rate.
+Generated 100/100 (100%). 180 total iterations, 0.56 success rate.</code></pre>
+<p>Now, the <code>match_null</code> column will all equal <code>"A2"</code>, because for all sets, conditions A1 and A3 are matched relative to A2.</p>
+<pre class="r"><code>stim3</code></pre>
+<pre><code>## # A tibble: 100 x 5
+##    item_nr A1        A2        A3        match_null
+##      &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;     
+##  1       1 face_2991 face_2698 face_3974 A2        
+##  2       2 face_3779 face_90   face_2811 A2        
+##  3       3 face_606  face_1737 face_3467 A2        
+##  4       4 face_1460 face_2587 face_2939 A2        
+##  5       5 face_2365 face_4296 face_329  A2        
+##  6       6 face_1466 face_1101 face_637  A2        
+##  7       7 face_4377 face_94   face_4468 A2        
+##  8       8 face_2385 face_1727 face_4100 A2        
+##  9       9 face_2575 face_3606 face_4879 A2        
+## 10      10 face_3024 face_796  face_3247 A2        
+## # ... with 90 more rows</code></pre>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

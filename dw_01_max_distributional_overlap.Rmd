@@ -9,8 +9,8 @@ output:
 In this example, I show how you can match two conditions on the distribution of one confounding variable using the overlapping index ([Pastore & Calcagni, 2019](https://doi.org/10.3389/fpsyg.2019.01089)). Here, we maximise distributional overlap to ensure our two conditions are distributionally similar.
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev.args = list(png = list(type = "cairo")))
 ggplot2::theme_set(ggplot2::theme_bw())
-knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Setup
@@ -123,7 +123,7 @@ res_sorted
 Now we can just extract the best seed as that which has the highest overlapping index.
 
 ```{r}
-# sort by distance ascendingly, so the best seed is at the top, and extract it
+# get the seed atthe top (that with highest overlap, since we sorted the dataframe)
 best_seed <- res_sorted %>%
   pull(seed) %>%
   first()
@@ -137,14 +137,14 @@ Now we know that *`r best_seed`* is the best seed, we can use that seed to recre
 
 ```{r}
 set.seed(best_seed)
-  
+
 best_stim <- stim_pool %>%
   filter(cond %in% c("young", "old")) %>%
   group_by(cond) %>%
   slice_sample(n = 100)
 ```
 
-To prove that the stimuli are well-matched face width, here is what the distribution of `face_width` looks like for each condition:
+To prove that the stimuli are well-matched on face width, here is what the distribution of `face_width` looks like for each condition:
 
 ```{r}
 ggplot(best_stim, aes(face_width, colour=cond, fill=cond)) +
@@ -156,7 +156,7 @@ We could use the faces in `best_stim` for our experiment, and be fairly sure tha
 For comparison, here is what the worst stimulus set looks like:
 
 ```{r}
-# sort ascendingly (smallest overlap first), and extract the top seed
+# sort ascendingly (smallest overlap first), and extract the seed with the worst match
 worst_seed <- res_sorted %>%
   arrange(ov) %>%
   pull(seed) %>%

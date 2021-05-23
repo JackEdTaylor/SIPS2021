@@ -1,0 +1,71 @@
+---
+title: "01 - Item-Wise Matching"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+When you match item-wise, you're finding items in each condition which are directly comparable across control variables. In this example, I'll show a simple item-wise example controlling for one variable.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev.args = list(png = list(type = "cairo")))
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+# Setup
+
+## Load Packages
+
+```{r, message=FALSE}
+library(tidyverse)
+library(LexOPS)  # package with functions for item-wise matching
+```
+
+## Import the Data
+
+```{r, message=FALSE}
+stim_pool <- read_csv("stim_pool.csv")
+```
+
+# Item-Wise Matching with LexOPS
+
+### **Step 1**: Find Matches
+
+Let's create a list of 100 young and 100 old faces, matched on face width within ±0.5 pixels. We can do this all in one go with LexOPS.
+
+1. Use `set_options()` to tell LexOPS which column contains the stimulus IDs
+2. Use `split_by()` to specify the conditions
+3. Use `control_for()` to specify the control variable
+4. Use `generate()` to find 100 matches, with a seed for reproducibility
+
+```{r}
+stim <- stim_pool %>%
+  set_options(id_col = "stim_id") %>%
+  split_by(age, 1:28 ~ 50:100) %>%
+  control_for(face_width, -0.5:0.5) %>%
+  generate(n=100, seed=42)
+```
+
+This gives us a list of matched pairs of young and old faces. Each row has a young face `A1`, and old face `A2`, and `match_null` (usually only relevant for designs with >2 conditions - see [04 - Setting the Match Null](iw_04_match_nulls.html)):
+
+```{r, eval=FALSE}
+stim
+```
+
+```{r, echo=FALSE}
+as_tibble(stim)
+```
+
+### **Step 2**: Check Stimuli
+
+We can quickly check how well our stimuli are matched with the `plot_design()` function.
+
+```{r}
+plot_design(stim)
+```
+
+This shows the expected result, where:
+
+* Condition A1 is all young faces, while condition A2 is all old faces
+* Condition A1 and A2 are matched pairwise for face width - note that this also results in very similar distributions

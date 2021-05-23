@@ -1,0 +1,84 @@
+---
+title: "06 - Matching in Euclidean Distance"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+Rather than matching with variable-specific tolerances, you might want to match using Euclidean distance in all variables. This example shows how you can adapt the examples shown so far to match in Euclidean distance. For an explanation of Euclidean distance, see [this vignette](https://jackedtaylor.github.io/LexOPSdocs/vignettes/euclidean-distance.html).
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev.args = list(png = list(type = "cairo")))
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+# Setup
+
+## Load Packages
+
+```{r, message=FALSE}
+library(tidyverse)
+library(LexOPS)  # package with functions for item-wise matching
+```
+
+## Import the Data
+
+```{r, message=FALSE}
+stim_pool <- read_csv("stim_pool.csv")
+```
+
+# Matching in Euclidean Distance
+
+### **Step 1**: Find Matches
+
+When you match in Euclidean distance, you can use a single tolerance to match all variables simultaneously. Here is an example, controlling for the same variables as in [03 - Matching >2 Conditions](iw_03_more_than_2_conds.html), but matching the numeric variables in 3D Euclidean space.
+
+To match in Euclidean distance, we can just use `control_for_euc()`. LexOPS will by default scale all values by their SD to give them equal weighting, before calculating the distances. This means that matching by ±0.5 in Euclidean distance is comparable to matching by ±0.5 SDs:
+
+```{r}
+stim <- stim_pool %>%
+  set_options(id_col = "stim_id") %>%
+  # create the three levels of age
+  split_by(age, 1:28 ~ 35:45 ~ 50:100) %>%
+  # control for all variables
+  control_for_euc(c(face_width, face_length, task_rt), -0.5:0.5) %>%
+  control_for(gender) %>%
+  generate(n=100, seed=42, match_null="inclusive")
+```
+
+As before, this gives us a list of matched triplets of young, middle-aged, and old faces. Each row has a young face `A1`, a middle-aged face `A2`, and an old face `A3`.
+
+```{r, eval=FALSE}
+stim
+```
+
+```{r, echo=FALSE}
+as_tibble(stim)
+```
+
+### **Step 2**: Check Stimuli
+
+We can check the values for each item with `long_format()`:
+
+```{r, eval=FALSE}
+long_format(stim)
+```
+
+```{r, echo=FALSE}
+as_tibble(long_format(stim))
+```
+
+We can look at the quality of the matching of the numeric values with `plot_design()`. Here, `control_map_1` contains the Euclidean distance values (technically it shows only one third of the values, since our matching was inclusive):
+
+```{r}
+plot_design(stim)
+```
+
+To check the matching of the variables that the Euclidean distance is calculated from, we can pass the variables to `plot_design()`:
+
+```{r}
+plot_design(stim, c("face_width", "face_length", "task_rt"))
+```
+
+As you can see, all variables are matched similarly closely.

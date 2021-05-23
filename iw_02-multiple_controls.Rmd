@@ -1,0 +1,85 @@
+---
+title: "02 - Multiple Controls"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+In this example I'll show how you can match multiple control variables, some numeric and some categorical.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev.args = list(png = list(type = "cairo")))
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+# Setup
+
+## Load Packages
+
+```{r, message=FALSE}
+library(tidyverse)
+library(LexOPS)  # package with functions for item-wise matching
+```
+
+## Import the Data
+
+```{r, message=FALSE}
+stim_pool <- read_csv("stim_pool.csv")
+```
+
+# Using Multiple Controls
+
+### **Step 1**: Find Matches
+
+To control for multiple variables in one stimulus set, we can just add more calls to `control_for()`. We'll control for:
+
+* Face width, within ±0.5 pixels
+* Face length, within ±2 pixels
+* Average response time on a behavioural task, within ±25 ms
+* Gender (match faces with a face of the same gender)
+
+```{r}
+stim <- stim_pool %>%
+  set_options(id_col = "stim_id") %>%
+  split_by(age, 1:28 ~ 50:100) %>%
+  control_for(face_width, -0.5:0.5) %>%
+  control_for(face_length, -2:2) %>%
+  control_for(task_rt, -25:25) %>%
+  control_for(gender) %>%
+  generate(n=100, seed=42)
+```
+
+This gives us a list of matched pairs of young and old faces. Each row has a young face `A1`, and old face `A2`, and `match_null` (usually only relevant for designs with >2 conditions - see [04 - Setting the Match Null](iw_04_match_nulls.html)):
+
+```{r, eval=FALSE}
+stim
+```
+
+```{r, echo=FALSE}
+as_tibble(stim)
+```
+
+### **Step 2**: Check Stimuli
+
+We can check the values for each item with `long_format()`:
+
+```{r, eval=FALSE}
+long_format(stim)
+```
+
+```{r, echo=FALSE}
+as_tibble(long_format(stim))
+```
+
+We can look at the quality of the matching of the numeric values with `plot_design()`:
+
+```{r}
+plot_design(stim)
+```
+
+This shows the expected result, where:
+
+* Face width is matched closely, within ±0.5 pixels
+* Face length is matched less closely, within ±2 pixels
+* Average response time on a behavioural task is matched very closely, within ±25 ms

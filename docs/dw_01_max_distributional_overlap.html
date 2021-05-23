@@ -323,6 +323,12 @@ div.tocify {
 <li>
   <a href="distribution-wise.html">Distribution-Wise Matching</a>
 </li>
+<li>
+  <a href="item-wise.html">Item-Wise Matching</a>
+</li>
+<li>
+  <a href="continuous_ivs.html">Continuous IVs</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -443,7 +449,7 @@ res_sorted</code></pre>
 ## 10  313692455 0.926
 ## # ... with 990 more rows</code></pre>
 <p>Now we can just extract the best seed as that which has the highest overlapping index.</p>
-<pre class="r"><code># sort by distance ascendingly, so the best seed is at the top, and extract it
+<pre class="r"><code># get the seed atthe top (that with highest overlap, since we sorted the dataframe)
 best_seed &lt;- res_sorted %&gt;%
   pull(seed) %&gt;%
   first()
@@ -455,18 +461,18 @@ best_seed</code></pre>
 <h3><strong>Step 6</strong>: Recreate the best stimulus set</h3>
 <p>Now we know that <em>1213885628</em> is the best seed, we can use that seed to recreate the stimulus set. This code needs to be identical to our simulation code to ensure we recreate the exact same stimulus set.</p>
 <pre class="r"><code>set.seed(best_seed)
-  
+
 best_stim &lt;- stim_pool %&gt;%
   filter(cond %in% c(&quot;young&quot;, &quot;old&quot;)) %&gt;%
   group_by(cond) %&gt;%
   slice_sample(n = 100)</code></pre>
-<p>To prove that the stimuli are well-matched face width, here is what the distribution of <code>face_width</code> looks like for each condition:</p>
+<p>To prove that the stimuli are well-matched on face width, here is what the distribution of <code>face_width</code> looks like for each condition:</p>
 <pre class="r"><code>ggplot(best_stim, aes(face_width, colour=cond, fill=cond)) +
   geom_density(alpha=0.4)</code></pre>
 <p><img src="dw_01_max_distributional_overlap_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>We could use the faces in <code>best_stim</code> for our experiment, and be fairly sure that we’ve controlled for face width.</p>
 <p>For comparison, here is what the worst stimulus set looks like:</p>
-<pre class="r"><code># sort ascendingly (smallest overlap first), and extract the top seed
+<pre class="r"><code># sort ascendingly (smallest overlap first), and extract the seed with the worst match
 worst_seed &lt;- res_sorted %&gt;%
   arrange(ov) %&gt;%
   pull(seed) %&gt;%

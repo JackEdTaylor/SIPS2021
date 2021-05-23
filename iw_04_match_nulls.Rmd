@@ -1,0 +1,110 @@
+---
+title: "04 - Setting the Match Null"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+In [03 - >2 Conditions](iw_03_more_than_2_conds.html), we matched three conditions by multiple variables. This might sometimes have unexpected effects, however. To explain why, we need to look at match nulls.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev.args = list(png = list(type = "cairo")))
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+# Setup
+
+## Load Packages
+
+```{r, message=FALSE}
+library(tidyverse)
+library(LexOPS)  # package with functions for item-wise matching
+```
+
+## Import the Data
+
+```{r, message=FALSE}
+stim_pool <- read_csv("stim_pool.csv")
+```
+
+# Using the Default Match Null
+
+In [03 - >2 Conditions](iw_03_more_than_2_conds.html), we matched three conditions on multiple control variables. Here is a recreation of those stimuli:
+
+```{r}
+stim1 <- stim_pool %>%
+  set_options(id_col = "stim_id") %>%
+  split_by(age, 1:28 ~ 35:45 ~ 50:100) %>%
+  control_for(face_width, -0.5:0.5) %>%
+  control_for(face_length, -2:2) %>%
+  control_for(task_rt, -25:25) %>%
+  control_for(gender) %>%
+  generate(n=100, seed=42)
+```
+
+This gives us the following result - notice the `match_null` column at the end. Each row has a different match null, one of the three conditions, which dictates which condition the other conditions are matched to. For example, for the first matched row, the conditions A2 and A3 are matched to condition A1.
+
+```{r, eval=FALSE}
+stim1
+```
+
+```{r, echo=FALSE}
+as_tibble(stim1)
+```
+
+By default, matching will be done in a *balanced* way, where a match null is pseudo-randomly chosen from the possible conditions, but with equal frequency in the final stimuli. This approach makes a lot of sense, but might give some unexpected results.
+
+As an example, imagine we set a tolerance of `-1:1`. The match null for a given item is A1, so A2 and A3 will be within ±1 of the item for condition A1. The problem is that A2 could equal A1-1, and A3 could be A1+1. This means that A2 and A3 could have a difference of up to ±2. If you have a tolerance of `-1:1`, you might want A2 and A3 to also be matched within ±1.
+
+The solution is to set the match null to "inclusive".
+
+# Using Inclusive Match Nulls
+
+If you want each condition to be matched to every other condition within your tolerance, you need to use an inclusive match null. You can do this by setting the `match_null` argument in `generate()`:
+
+```{r}
+stim2 <- stim_pool %>%
+  set_options(id_col = "stim_id") %>%
+  split_by(age, 1:28 ~ 35:45 ~ 50:100) %>%
+  control_for(face_width, -0.5:0.5) %>%
+  control_for(face_length, -2:2) %>%
+  control_for(task_rt, -25:25) %>%
+  control_for(gender) %>%
+  generate(n=100, seed=42, match_null="inclusive")
+```
+
+This time, the `match_null` column will all equal `NA`, because every condition is matched to every other condition.
+
+```{r, eval=FALSE}
+stim2
+```
+
+```{r, echo=FALSE}
+as_tibble(stim2)
+```
+
+# Using Conditions as Match Nulls
+
+On the other hand, you may have a design where you wish to use the same match null for each matched set. For example, you might want to treat faces as a null in your experimental design, and wish for a set of young faces matched to middle-aged faces, and a list of older faces matched to the same items. You can do this by giving a specific condition to the `match_null` argument of `generate()`:
+
+```{r}
+stim3 <- stim_pool %>%
+  set_options(id_col = "stim_id") %>%
+  split_by(age, 1:28 ~ 35:45 ~ 50:100) %>%
+  control_for(face_width, -0.5:0.5) %>%
+  control_for(face_length, -2:2) %>%
+  control_for(task_rt, -25:25) %>%
+  control_for(gender) %>%
+  generate(n=100, seed=42, match_null="A2")
+```
+
+Now, the `match_null` column will all equal `"A2"`, because for all sets, conditions A1 and A3 are matched relative to A2.
+
+```{r, eval=FALSE}
+stim3
+```
+
+```{r, echo=FALSE}
+as_tibble(stim3)
+```

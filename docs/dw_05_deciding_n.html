@@ -323,6 +323,12 @@ div.tocify {
 <li>
   <a href="distribution-wise.html">Distribution-Wise Matching</a>
 </li>
+<li>
+  <a href="item-wise.html">Item-Wise Matching</a>
+</li>
+<li>
+  <a href="continuous_ivs.html">Continuous IVs</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -355,8 +361,8 @@ library(overlapping)  # contains function for calculating overlap index</code></
 <pre class="r"><code>stim_pool &lt;- read_csv(&quot;stim_pool.csv&quot;)</code></pre>
 </div>
 </div>
-<div id="matching-2-conditions" class="section level1">
-<h1>Matching &gt;2 Conditions</h1>
+<div id="deciding-how-many-iterations" class="section level1">
+<h1>Deciding How Many Iterations</h1>
 <p>We’ll create a list of 100 young, 100 middle-aged, and 100 old faces.</p>
 <div id="step-1-identify-conditions" class="section level3">
 <h3><strong>Step 1</strong>: Identify conditions</h3>
@@ -454,7 +460,7 @@ seeds &lt;- sample(1:.Machine$integer.max, n_iter)</code></pre>
   ggplot(aes(iter_nr, cum_max)) +
   geom_line()</code></pre>
 <p><img src="dw_05_deciding_n_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<p>If we’d run for 500 iterations, we’d get a maximum average overlap of about 0.85. If we’d run for 1000 iterations, this would reach about 0.865. Our final result was 0.884.</p>
+<p>If we’d run for 500 iterations, we’d get a maximum average overlap of about 0.85. If we’d run for 1000 iterations, this would reach about 0.865. Our final result was 0.884. Between 2000 and 5000 no better matches were found, though if we ran for a bit longer (e.g., 10000 iterations), we would most likely get even better matches.</p>
 <p>Notice that as we add more iterations, we get better matches, but the increase in overlapping index becomes smaller and smaller. At some point, you can expect adding iterations to make no practical change in the quality of the matching. This makes sense - as we add samples from population, the chance that any observation will be the maximum decreases over time.</p>
 <p>The exact number of iterations we need to get a good match will depend on several characteristics, such as the number of conditions, and the number of control variables. As you increase the complexity of the design, you’re essentially adding more degrees of freedom. The more things that can vary in your design, the more possible solutions there are, and so the more iterations you’ll need to get a match of similar quality.</p>
 <p>My advice is to create a plot like that above, and see how close you are to levelling off the improvement in your statistic. If the results are levelling off at a poor result (e.g., an average overlap of 0.5), it might be that a good match might not be possible for your sample. This could either be because of a small pool of candidates, or because of a collinearity in the data.</p>

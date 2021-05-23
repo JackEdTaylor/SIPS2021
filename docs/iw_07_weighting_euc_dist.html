@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>07 - Weighting Euclidean Distance</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-sm-12 col-md-4 col-lg-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-sm-12 col-md-8 col-lg-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">SIPS 2021: Matching Stimuli</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="distribution-wise.html">Distribution-Wise Matching</a>
+</li>
+<li>
+  <a href="item-wise.html">Item-Wise Matching</a>
+</li>
+<li>
+  <a href="continuous_ivs.html">Continuous IVs</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">07 - Weighting Euclidean Distance</h1>
+
+</div>
+
+
+<p>In <a href="iw_06_euclidean_dist.html">06 - Matching in Euclidean Distance</a>, we saw how you can match multiple numeric variables by Euclidean distance. However, you might still want to match some of those variables more closely than others. We can do this with weights.</p>
+<div id="setup" class="section level1">
+<h1>Setup</h1>
+<div id="load-packages" class="section level2">
+<h2>Load Packages</h2>
+<pre class="r"><code>library(tidyverse)
+library(LexOPS)  # package with functions for item-wise matching</code></pre>
+</div>
+<div id="import-the-data" class="section level2">
+<h2>Import the Data</h2>
+<pre class="r"><code>stim_pool &lt;- read_csv(&quot;stim_pool.csv&quot;)</code></pre>
+</div>
+</div>
+<div id="matching-in-euclidean-distance" class="section level1">
+<h1>Matching in Euclidean Distance</h1>
+<div id="step-1-find-matches" class="section level3">
+<h3><strong>Step 1</strong>: Find Matches</h3>
+<p>As in <a href="iw_06_euclidean_dist.html">06 - Matching in Euclidean Distance</a>, we’ll match face width, face length, and task response time in Euclidean space. However, we decide that we want to weight these controls differentially, because some are more important to match than others. Specifically, we decide that:</p>
+<ul>
+<li>Face width is the most important variable to match</li>
+<li>Face length is kind of important to match</li>
+<li>Task response time is useful to match, but least important</li>
+</ul>
+<p>We can pass weights, reflecting the relative importance of the controls, to <code>control_for_euc()</code>. These weights should be a vector of numbers in the same order as the variables given as controls. Importantly, it’s the relative sizes of the weights that matters - they will be automatically scaled by LexOPS so we don’t have to change our overall tolerance (<code>-0.5:0.5</code>).</p>
+<pre class="r"><code>stim &lt;- stim_pool %&gt;%
+  set_options(id_col = &quot;stim_id&quot;) %&gt;%
+  # create the three levels of age
+  split_by(age, 1:28 ~ 35:45 ~ 50:100) %&gt;%
+  # control for all variables
+  control_for_euc(c(face_width, face_length, task_rt), -0.5:0.5, weights = c(10, 5, 2)) %&gt;%
+  control_for(gender) %&gt;%
+  generate(n=100, seed=42, match_null=&quot;inclusive&quot;)</code></pre>
+<pre><code>## Generated 5/100 (5%). 9 total iterations, 0.56 success rate.
+Generated 10/100 (10%). 16 total iterations, 0.62 success rate.
+Generated 15/100 (15%). 23 total iterations, 0.65 success rate.
+Generated 20/100 (20%). 33 total iterations, 0.61 success rate.
+Generated 25/100 (25%). 44 total iterations, 0.57 success rate.
+Generated 30/100 (30%). 52 total iterations, 0.58 success rate.
+Generated 35/100 (35%). 64 total iterations, 0.55 success rate.
+Generated 40/100 (40%). 75 total iterations, 0.53 success rate.
+Generated 45/100 (45%). 83 total iterations, 0.54 success rate.
+Generated 50/100 (50%). 93 total iterations, 0.54 success rate.
+Generated 55/100 (55%). 104 total iterations, 0.53 success rate.
+Generated 60/100 (60%). 114 total iterations, 0.53 success rate.
+Generated 65/100 (65%). 128 total iterations, 0.51 success rate.
+Generated 70/100 (70%). 138 total iterations, 0.51 success rate.
+Generated 75/100 (75%). 150 total iterations, 0.50 success rate.
+Generated 80/100 (80%). 162 total iterations, 0.49 success rate.
+Generated 85/100 (85%). 174 total iterations, 0.49 success rate.
+Generated 90/100 (90%). 185 total iterations, 0.49 success rate.
+Generated 95/100 (95%). 194 total iterations, 0.49 success rate.
+Generated 100/100 (100%). 205 total iterations, 0.49 success rate.</code></pre>
+<p>As before, this gives us a list of matched triplets of young, middle-aged, and old faces. Each row has a young face <code>A1</code>, a middle-aged face <code>A2</code>, and an old face <code>A3</code>.</p>
+<pre class="r"><code>stim</code></pre>
+<pre><code>## # A tibble: 100 x 5
+##    item_nr A1        A2        A3        match_null
+##      &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;     
+##  1       1 face_1974 face_1323 face_3571 &lt;NA&gt;      
+##  2       2 face_4690 face_1465 face_163  &lt;NA&gt;      
+##  3       3 face_4758 face_4083 face_4762 &lt;NA&gt;      
+##  4       4 face_2965 face_2527 face_4021 &lt;NA&gt;      
+##  5       5 face_4439 face_345  face_3077 &lt;NA&gt;      
+##  6       6 face_1207 face_3714 face_2455 &lt;NA&gt;      
+##  7       7 face_1700 face_493  face_1198 &lt;NA&gt;      
+##  8       8 face_3803 face_1182 face_1709 &lt;NA&gt;      
+##  9       9 face_3464 face_537  face_4372 &lt;NA&gt;      
+## 10      10 face_2064 face_4458 face_1381 &lt;NA&gt;      
+## # ... with 90 more rows</code></pre>
+</div>
+<div id="step-2-check-stimuli" class="section level3">
+<h3><strong>Step 2</strong>: Check Stimuli</h3>
+<p>We can check the values for each item with <code>long_format()</code>:</p>
+<pre class="r"><code>long_format(stim)</code></pre>
+<pre><code>## # A tibble: 307 x 7
+##    item_nr condition match_null stim_id   gender   age control_map_1    
+##      &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;      &lt;chr&gt;     &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;            
+##  1       1 A1        &lt;NA&gt;       face_1974 m         24 0                
+##  2       1 A2        &lt;NA&gt;       face_1323 m         43 0.273218812990132
+##  3       1 A3        &lt;NA&gt;       face_3571 m         57 0.490728856072509
+##  4       2 A1        &lt;NA&gt;       face_4690 m         18 0.196491173340288
+##  5       2 A2        &lt;NA&gt;       face_1465 m         40 0.378832631634821
+##  6       2 A3        &lt;NA&gt;       face_163  m         50 0                
+##  7       3 A1        &lt;NA&gt;       face_4758 m         20 0.396889229473117
+##  8       3 A2        &lt;NA&gt;       face_4083 m         40 0                
+##  9       3 A3        &lt;NA&gt;       face_4762 m         60 0.479637465327233
+## 10       4 A1        &lt;NA&gt;       face_2965 f         24 0                
+## # ... with 297 more rows</code></pre>
+<p>To check the matching of the variables that the Euclidean distance is calculated from, we can pass the variables to <code>plot_design()</code>:</p>
+<pre class="r"><code>plot_design(stim, c(&quot;face_width&quot;, &quot;face_length&quot;, &quot;task_rt&quot;))</code></pre>
+<p><img src="iw_07_weighting_euc_dist_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>As you can see, this time the precision with which the three variables are matched reflects the relative sizes of the weights we gave, where face width is matched very closely, face length is matched quite closely, and task response time is matched very loosely.</p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

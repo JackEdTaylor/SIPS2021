@@ -11,7 +11,7 @@
 
 
 
-<title>03 - Multiple Control Variables</title>
+<title>01 - Minimising Mutual Information</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -323,6 +323,12 @@ div.tocify {
 <li>
   <a href="distribution-wise.html">Distribution-Wise Matching</a>
 </li>
+<li>
+  <a href="item-wise.html">Item-Wise Matching</a>
+</li>
+<li>
+  <a href="continuous_ivs.html">Continuous IVs</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -335,167 +341,123 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">03 - Multiple Control Variables</h1>
+<h1 class="title toc-ignore">01 - Minimising Mutual Information</h1>
 
 </div>
 
 
-<p>In this example, let’s match on more than one control variable, but also weight the control variables by how important we think it is that they be matched. We’ll use the same design as in <a href="dw_03_multiple_controls.html">03 - Multiple Control Variables</a> and control for three variables simultaneously: <code>face_width</code>, <code>face_length</code>, and <code>task_rt</code>. This time, however, we’ll weight overlapping index values by the importance of each control variable.</p>
+<p>In this example, I show how you can minimise the mutual information between a continuous independent variable, and a continuous confounding variable. This lets you design controlled stimuli with continuous predictors.</p>
 <div id="setup" class="section level1">
 <h1>Setup</h1>
 <div id="load-packages" class="section level2">
 <h2>Load Packages</h2>
 <pre class="r"><code>library(tidyverse)
-library(overlapping)  # contains function for calculating overlap index</code></pre>
+library(infotheo)  # package with functions for calculating mutual information</code></pre>
 </div>
 <div id="import-the-data" class="section level2">
 <h2>Import the Data</h2>
 <pre class="r"><code>stim_pool &lt;- read_csv(&quot;stim_pool.csv&quot;)</code></pre>
 </div>
 </div>
-<div id="matching-using-multiple-controls" class="section level1">
-<h1>Matching Using Multiple Controls</h1>
-<p>As mentioned, we’ll again create a list of 100 young and 100 old faces. We’re matching on face width, face length, and response time on a task (<code>task_rt</code>). Importantly, this time we’re weighting overlap index values by their relative importance.</p>
-<div id="step-1-identify-conditions" class="section level3">
-<h3><strong>Step 1</strong>: Identify conditions</h3>
-<p>First, we define our conditions. We’ll use the same conditions as in <a href="dw_01_max_distributional_overlap.html">01 - Maximising Distributional Overlap</a>.</p>
-<pre class="r"><code>stim_pool &lt;- mutate(stim_pool, cond = case_when(age&lt;28 ~ &quot;young&quot;, age&gt;50 ~ &quot;old&quot;))</code></pre>
-</div>
-<div id="step-2-create-a-vector-of-seeds" class="section level3">
-<h3><strong>Step 2</strong>: Create a vector of seeds</h3>
-<p>As before, we’ll create a vector of a large number of random seeds so we can reproduce our stimulus sets. For speed, I’m only running 1000 iterations in this example, but I recommend running much larger numbers of iterations to improve the quality of the match.</p>
+<div id="minimising-mutual-information" class="section level1">
+<h1>Minimising Mutual Information</h1>
+<p>Let’s create a list of 100 items, where age varies continuously, but face width is controlled for.</p>
+<div id="step-1-create-a-vector-of-seeds" class="section level3">
+<h3><strong>Step 1</strong>: Create a vector of seeds</h3>
+<p>Before we can start with the simulations, we need to make sure our datasets will be reproducible. We can do this by creating a vector of seeds which will be used to select our stimuli. Random seeds make the random number generator give reproducible results. If we want to run 50000 simulations, this code will create a vector of 50000 random seeds for us. Random seed values can be any integer (whole number) we can represent in R. The smallest possible seed is 1, and we can use <code>.Machine$integer.max</code> to get the maximum possible seed number R will let us represent.</p>
+<p>I also set the seed first so the result are reproducible, but feel free to comment that out if you would like to get a different result to mine.</p>
 <pre class="r"><code>set.seed(42)  # comment this line out (put # at the start of the line) to get a different result to mine
-n_iter &lt;- 2
+n_iter &lt;- 50000
 seeds &lt;- sample(1:.Machine$integer.max, n_iter)</code></pre>
 </div>
-<div id="step-3-identify-the-control-variables" class="section level3">
-<h3><strong>Step 3</strong>: Identify the Control Variables</h3>
-<p>We’ll create a vector of the column names for the variables we want to control for. We’ll use this to loop over the control variables.</p>
-<pre class="r"><code>control_vars &lt;- c(&quot;face_width&quot;, &quot;face_length&quot;, &quot;task_rt&quot;)</code></pre>
-</div>
-<div id="step-4-simulate-a-large-number-of-samples" class="section level3">
-<h3><strong>Step 4</strong>: Simulate a large number of samples</h3>
-<p>As before, we want to simulate a large number of random samples. Again, we’re recording distributional overlap on three different control variables. To do this, we can just use a nested <code>sapply()</code> loop.</p>
+<div id="step-2-simulate-a-large-number-of-samples" class="section level3">
+<h3><strong>Step 2</strong>: Simulate a large number of samples</h3>
+<p>We want to simulate a large number of random samples. On each iteration, we can record the mutual information between face width and age. We can use <code>map_df()</code> to loop over our seeds and record the mutual information values from each iteration in a large dataframe.</p>
+<p>Depending on how many iterations we run, this could take a long time.</p>
 <pre class="r"><code>res &lt;- map_df(seeds, function(seed_i) {
   # set the seed, so we can recreate any sample later
   set.seed(seed_i)
   
-  sample &lt;- stim_pool %&gt;%
-    # only keep observations from conditions we are interested in (remove faces from ages 29 to 49)
-    filter(cond %in% c(&quot;young&quot;, &quot;old&quot;)) %&gt;%
-    # for each condition, randomly select 100 items
-    group_by(cond) %&gt;%
-    slice_sample(n = 100)
+  # get a random sample of 200 items from the pool
+  sample &lt;- slice_sample(stim_pool, n = 100)
   
-  # for each control variable, record the overlap between the two conditions
-  control_ov &lt;- sapply(control_vars, function(var_i) {
-    # get the values for this control variable for the young condition
-    var_i_young &lt;-  sample %&gt;%
-      filter(cond == &quot;young&quot;) %&gt;%
-      pull(!!var_i)
-    
-    # get the values for this control variable for the old condition
-    var_i_old &lt;-  sample %&gt;%
-      filter(cond == &quot;old&quot;) %&gt;%
-      pull(!!var_i)
-    
-    # get the degree of overlap on the control variable between the two samples
-    ov_results &lt;- overlapping::overlap(list(var_i_young, var_i_old))
-    
-    # extract the actual value for the degree of overlap
-    ov_results$OV
-  })
+  # discretise the face_width values, since the mutinformation methods need discrete data
+  face_width_disc &lt;- discretize(sample$face_width)
   
-  # return a dataframe with the overlap for the three control variables
-  tibble(seed = seed_i, control = control_vars, ov = control_ov)
+  # get the mutual information between age and face width
+  mi_value &lt;- mutinformation(sample$age, face_width_disc)
+  
+  # return a row of the dataframe with the seed and overlap value
+  tibble(seed = seed_i, mi = mi_value)
 })</code></pre>
 </div>
-<div id="step-5-calculate-overall-overlap" class="section level3">
-<h3><strong>Step 5</strong>: Calculate overall overlap</h3>
-<p>Now we can calculate the average overlap for each seed. This time, we’re weighting this average differently for each control variable. Let’s imagine we decide that controlling for face width and face length is three times more important than controlling for task response time.</p>
-<p>As a first step, I create a table which will let us look up the weight for each control variable. Since we don’t care about scaling the weighted average (the maximum will always be the maximum value), we don’t have to worry about scaling the weights, so we can just use <code>c(3, 3, 1)</code> to reflect that <code>face_width</code> and <code>face_length</code> are three times more important than <code>task_rt</code>.</p>
-<pre class="r"><code>control_weights &lt;- tibble(
-  control = c(&quot;face_width&quot;, &quot;face_length&quot;, &quot;task_rt&quot;),
-  weight = c(20, 20, 1)
-)</code></pre>
-<p>We can now join these weights to our results (using a <a href="https://dplyr.tidyverse.org/reference/join.html"><code>dplyr</code> join function</a>), calculate the weighted overlap index (<code>ov_weighted</code>), and then calculate the average overlap index on these weighted values.</p>
-<pre class="r"><code>res_summ &lt;- res %&gt;%
-  left_join(control_weights, by=&quot;control&quot;) %&gt;%
-  mutate(ov_weighted = ov * weight) %&gt;%
-  group_by(seed) %&gt;%
-  summarise(mean_ov_weighted = mean(ov_weighted))</code></pre>
-</div>
-<div id="step-6-check-the-results" class="section level3">
-<h3><strong>Step 6</strong>: Check the results</h3>
-<p>We can now check the distribution of <code>mean_ov_weighted</code>. Since we didn’t scale our weights, the average is no longer bounded between 0 and 1. However, the best match is still the sample with the highest number.</p>
-<pre class="r"><code>ggplot(res_summ, aes(mean_ov_weighted)) +
+<div id="step-3-check-the-results" class="section level3">
+<h3><strong>Step 3</strong>: Check the results</h3>
+<p>We can now look at the distribution of mutual information values from all the random samples. The closer to 0, the less mutual information in the variables, and the better the match. I’ve added the points below the distribution to show the results from each individual sample.</p>
+<pre class="r"><code>ggplot(res, aes(mi)) +
   geom_density() +
   geom_point(aes(y = -0.5), position = position_jitter(height=0.5)) +
-  xlab(&quot;Mean Overlapping Index&quot;)</code></pre>
-<p><img src="dw_99_weighting_controls_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+  xlab(&quot;Mutual Information&quot;)</code></pre>
+<p><img src="c_01_minimising_mi_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
-<div id="step-7-find-the-best-stimulus-set" class="section level3">
-<h3><strong>Step 7</strong>: Find the best stimulus set</h3>
-<p>We can now sort the results by mean weighted overlapping index (descendingly) to order them by how well-matched the conditions are.</p>
-<pre class="r"><code>res_sorted &lt;- arrange(res_summ, desc(mean_ov_weighted))
+<div id="step-4-find-the-best-stimulus-set" class="section level3">
+<h3><strong>Step 4</strong>: Find the best stimulus set</h3>
+<p>We can now sort the results by mutual information (ascendingly) to order them by how well-matched the conditions are.</p>
+<pre class="r"><code>res_sorted &lt;- arrange(res, mi)
 
 res_sorted</code></pre>
-<pre><code>## # A tibble: 2 x 2
-##         seed mean_ov_weighted
-##        &lt;int&gt;            &lt;dbl&gt;
-## 1 1228985497             11.4
-## 2 1781592037             11.2</code></pre>
-<p>Now we can just extract the best seed as that which has the highest overlapping index.</p>
-<pre class="r"><code># sort by distance ascendingly, so the best seed is at the top, and extract it
-best_seed &lt;- res_sorted %&gt;%
+<pre><code>## # A tibble: 50,000 x 2
+##          seed    mi
+##         &lt;int&gt; &lt;dbl&gt;
+##  1  593758806 0.440
+##  2  850299925 0.441
+##  3  495235614 0.448
+##  4  443280554 0.449
+##  5 1581154247 0.451
+##  6  692482932 0.452
+##  7  216592018 0.458
+##  8 1567192811 0.463
+##  9 1868145521 0.465
+## 10 1301707060 0.466
+## # ... with 49,990 more rows</code></pre>
+<p>Now we can just extract the best seed as that which has the lowest mutual information.</p>
+<pre class="r"><code>best_seed &lt;- res_sorted %&gt;%
   pull(seed) %&gt;%
   first()
 
 best_seed</code></pre>
-<pre><code>## [1] 1228985497</code></pre>
+<pre><code>## [1] 593758806</code></pre>
 </div>
-<div id="step-8-recreate-the-best-stimulus-set" class="section level3">
-<h3><strong>Step 8</strong>: Recreate the best stimulus set</h3>
-<p>Now we know that <em>1228985497</em> is the best seed, we can use that seed to recreate the stimulus set. This code needs to be identical to our simulation code to ensure we recreate the exact same stimulus set.</p>
+<div id="step-6-recreate-the-best-stimulus-set" class="section level3">
+<h3><strong>Step 6</strong>: Recreate the best stimulus set</h3>
+<p>Now we know that <em>593758806</em> is the best seed, we can use that seed to recreate the stimulus set. This code needs to be identical to our simulation code to ensure we recreate the exact same stimulus set.</p>
 <pre class="r"><code>set.seed(best_seed)
   
-best_stim &lt;- stim_pool %&gt;%
-  filter(cond %in% c(&quot;young&quot;, &quot;old&quot;)) %&gt;%
-  group_by(cond) %&gt;%
-  slice_sample(n = 100)</code></pre>
-<p>To prove that the stimuli are well-matched, here is what the distribution of each control variable looks like in each condition:</p>
-<pre class="r"><code>best_stim %&gt;%
-  pivot_longer(all_of(control_vars), names_to=&quot;control&quot;, values_to=&quot;control_value&quot;) %&gt;%
-  ggplot(aes(control_value, colour=cond, fill=cond)) +
-  geom_density(alpha=0.4) +
-  facet_wrap(vars(control), scales=&quot;free&quot;)</code></pre>
-<p><img src="dw_99_weighting_controls_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+best_stim &lt;- slice_sample(stim_pool, n = 100)</code></pre>
+<p>To prove that the stimuli are well-controlled, here is a scatter pot of <code>age</code> (the IV) by <code>face_width</code> (the control variable):</p>
+<pre class="r"><code>ggplot(best_stim, aes(age, face_width)) +
+  geom_point() +
+  geom_smooth()</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="c_01_minimising_mi_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 <p>We could use the faces in <code>best_stim</code> for our experiment, and be fairly sure that we’ve controlled for face width.</p>
 <p>For comparison, here is what the worst stimulus set looks like:</p>
-<pre class="r"><code># sort ascendingly (smallest overlap first), and extract the top seed
+<pre class="r"><code># sort descendingly (highest mutual information first), and extract the top seed
 worst_seed &lt;- res_sorted %&gt;%
-  arrange(mean_ov_weighted) %&gt;%
+  arrange(desc(mi)) %&gt;%
   pull(seed) %&gt;%
   first()
 
 set.seed(worst_seed)
 
 # recreate the worst stimulus set
-worst_stim &lt;- stim_pool %&gt;%
-  filter(cond %in% c(&quot;young&quot;, &quot;old&quot;)) %&gt;%
-  group_by(cond) %&gt;%
-  slice_sample(n = 100)
+worst_stim &lt;- slice_sample(stim_pool, n = 100)
 
-worst_stim %&gt;%
-  pivot_longer(control_vars, names_to=&quot;control&quot;, values_to=&quot;control_value&quot;) %&gt;%
-  ggplot(aes(control_value, colour=cond, fill=cond)) +
-  geom_density(alpha=0.4) +
-  facet_wrap(vars(control), scales=&quot;free&quot;)</code></pre>
-<pre><code>## Note: Using an external vector in selections is ambiguous.
-## i Use `all_of(control_vars)` instead of `control_vars` to silence this message.
-## i See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.
-## This message is displayed once per session.</code></pre>
-<p><img src="dw_99_weighting_controls_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+ggplot(worst_stim, aes(age, face_width)) +
+  geom_point() +
+  geom_smooth()</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="c_01_minimising_mi_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 </div>
 </div>
 

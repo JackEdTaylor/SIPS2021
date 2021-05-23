@@ -13,8 +13,8 @@ As in the previous example, we'll match control variables across three condition
 We'll run a total of 20000 iterations, and show what happens as we vary this number.
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev.args = list(png = list(type = "cairo")))
 ggplot2::theme_set(ggplot2::theme_bw())
-knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Setup
@@ -32,7 +32,7 @@ library(overlapping)  # contains function for calculating overlap index
 stim_pool <- read_csv("stim_pool.csv")
 ```
 
-# Matching >2 Conditions
+# Deciding How Many Iterations
 
 We'll create a list of 100 young, 100 middle-aged, and 100 old faces.
 
@@ -154,7 +154,7 @@ res_summ %>%
   geom_line()
 ```
 
-If we'd run for 500 iterations, we'd get a maximum average overlap of about 0.85. If we'd run for 1000 iterations, this would reach about 0.865. Our final result was `r round(max(res_summ$mean_ov), 3)`. 
+If we'd run for 500 iterations, we'd get a maximum average overlap of about 0.85. If we'd run for 1000 iterations, this would reach about 0.865. Our final result was `r round(max(res_summ$mean_ov), 3)`. Between 2000 and 5000 no better matches were found, though if we ran for a bit longer (e.g., 10000 iterations), we would most likely get even better matches.
 
 Notice that as we add more iterations, we get better matches, but the increase in overlapping index becomes smaller and smaller. At some point, you can expect adding iterations to make no practical change in the quality of the matching. This makes sense - as we add samples from population, the chance that any observation will be the maximum decreases over time.
 

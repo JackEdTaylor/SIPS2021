@@ -9,8 +9,8 @@ output:
 In this example, let's match on more than one control variable. We'll use the same design as in [01 - Maximising Distributional Overlap](dw_01_max_distributional_overlap.html), but control for three variables simultaneously: `face_width`, `face_length`, and `task_rt`. We'll match for variables using the Overlapping Index (although we could use other statistics if we wanted).
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev.args = list(png = list(type = "cairo")))
 ggplot2::theme_set(ggplot2::theme_bw())
-knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Setup

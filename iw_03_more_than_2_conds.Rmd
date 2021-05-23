@@ -1,0 +1,84 @@
+---
+title: "03 - More than 2 Conditions"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+In this example I'll show how you can add more levels to an independent variable.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev.args = list(png = list(type = "cairo")))
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+# Setup
+
+## Load Packages
+
+```{r, message=FALSE}
+library(tidyverse)
+library(LexOPS)  # package with functions for item-wise matching
+```
+
+## Import the Data
+
+```{r, message=FALSE}
+stim_pool <- read_csv("stim_pool.csv")
+```
+
+# Matching >2 Conditions
+
+### **Step 1**: Find Matches
+
+This time, we use the same design as in [02 - Multiple Control Variables](iw_02_multiple_controls.html), but with an extra middle-aged condition. In total, we'll have three conditions:
+
+* Younger faces, aged <=28
+* Middle-Aged faces, aged 35-45
+* Older faces, aged >=50
+
+We can add new age conditions with the `~` symbol:
+
+```{r}
+stim <- stim_pool %>%
+  set_options(id_col = "stim_id") %>%
+  # create the three levels of age
+  split_by(age, 1:28 ~ 35:45 ~ 50:100) %>%
+  # control for all variables
+  control_for(face_width, -0.5:0.5) %>%
+  control_for(face_length, -2:2) %>%
+  control_for(task_rt, -25:25) %>%
+  control_for(gender) %>%
+  generate(n=100, seed=42)
+```
+
+This gives us a list of matched triplets of young, middle-aged, and old faces. Each row has a young face `A1`, a middle-aged face `A2`, and an old face `A3`. There is also a `match_null` column (see [04 - Setting the Match Null](iw_04_match_nulls.html) for an explanation of match nulls).
+
+```{r, eval=FALSE}
+stim
+```
+
+```{r, echo=FALSE}
+as_tibble(stim)
+```
+
+### **Step 2**: Check Stimuli
+
+We can check the values for each item with `long_format()`:
+
+```{r, eval=FALSE}
+long_format(stim)
+```
+
+```{r, echo=FALSE}
+as_tibble(long_format(stim))
+```
+
+We can look at the quality of the matching of the numeric values with `plot_design()`:
+
+```{r}
+plot_design(stim)
+```
+
+This shows the expected result, with the control variables matched item-wise across the three conditions.

@@ -7,23 +7,17 @@ author: "Jack E. Taylor"
 library(fontawesome)
 ```
 
-<br>
-
 This website contains materials associated with a workshop presented at the Society for Improving Psychological Science ([SIPS 2021](https://www.improvingpsych.org/SIPS2021/)): **Matching Stimuli (or Anything) Reproducibly**. If you find any issues with the site or materials, please [let me know](https://github.com/JackEdTaylor/SIPS2021/issues/new).
 
 <br>
 
 **Workshop Abstract**: Researchers often need to tightly control for confounding variables across conditions. Often, however, researchers are limited to using only a finite set of existing items. For example, you may be restricted to using a database of only a limited number of candidate words, or images of faces, or recordings of speech. Usually, people approach this problem by manually finding close matches on relevant dimensions. Manually crafting stimuli in this way is time-consuming and very difficult to do reproducibly. In this workshop, I'll show two solutions, using existing tools, for creating controlled stimuli reproducibly in R. The first solution uses an item-wise approach, creating directly comparable items in each condition. The second solution uses a distribution-wise approach, maximising the similarity in distributions across conditions. I’ll show how these two solutions are extremely flexible and can be applied to a range of different problems. Finally, I’ll discuss how using such an approach can aid reproducibility, replicability, and transparency of studies’ methods.
 
-<br>
-
 ## Slides
 
 `r fa(name = "file-powerpoint")` Workshop slides in *.pptx* format.
 
 `r fa(name = "file-pdf")` Workshop slides in *.pdf* format.
-
-<br>
 
 ## Example Code
 
@@ -33,15 +27,13 @@ The example code is split into three different approaches to generating stimuli:
 
 1. [Distribution-Wise Matching](distribution-wise.html) - Matching conditions distribution-wise, so that control variables are similarly distributed in each condition.
 
-2. Item-Wise Matching - Matching items in each condition with items in every other condition, so that there are directly comparable sets with items in each condition.
+2. [Item-Wise Matching](item-wise.html) - Matching items in each condition with items in every other condition, so that there are directly comparable sets with items in each condition.
 
-3. Continuous IVs - Controlling for variables across a continuous independent variable.
+3. [Continuous IVs](continuous_ivs.html) - Controlling for variables across a continuous independent variable.
 
 For readability, the code mostly uses [tidyverse](https://www.tidyverse.org/) packages, and tidyverse-style code. If this is something you're unfamiliar with, I can definitely recommend the [University of Glasgow Psychology course materials](https://psyteachr.github.io/ug1-practical/) as an introduction with a focus on Psychology.
 
 All the code uses the same (made-up) dataset: [stim_pool.csv](dat/stim_pool.csv). If you have trouble downloading the csv, try downloading it in a zip: [stim_pool.zip](dat/stim_pool.zip). The csv is a simulated database of face images. All the example code generates lists of controlled stimuli for different imagined experimental designs.
-
-<br>
 
 ## Other Useful Links
 
