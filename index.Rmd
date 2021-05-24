@@ -15,9 +15,9 @@ This website contains materials associated with a workshop presented at the Soci
 
 ## Slides
 
-`r fa(name = "file-powerpoint")` Workshop slides in *.pptx* format.
+`r fa(name = "file-powerpoint")` [Workshop slides in *.pptx* format](slides/designing_stimuli.pptx).
 
-`r fa(name = "file-pdf")` Workshop slides in *.pdf* format.
+`r fa(name = "file-pdf")` [Workshop slides in *.pdf* format.](slides/designing_stimuli.pdf)
 
 ## Example Code
 
