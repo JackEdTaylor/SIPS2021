@@ -56,7 +56,7 @@ tribble(
 
 ```{r, echo=FALSE, message=FALSE}
 # create a zip folder of all the RMarkdown examples
-zip("itemwise.zip", list.files(pattern = "^iw_\\d{2}_.+\\.Rmd$"))
+zip("itemwise.zip", c("stim_pool.csv", list.files(pattern = "^iw_\\d{2}_.+\\.Rmd$")))
 ```
 
 [`r fa(name = "download")` Download code for all examples](itemwise.zip)
