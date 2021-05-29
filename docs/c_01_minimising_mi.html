@@ -351,18 +351,8 @@ div.tocify {
 <h1>Setup</h1>
 <div id="load-packages" class="section level2">
 <h2>Load Packages</h2>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## Warning: package &#39;tidyverse&#39; was built under R version 4.1.0</code></pre>
-<pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 4.1.0</code></pre>
-<pre><code>## Warning: package &#39;tibble&#39; was built under R version 4.1.0</code></pre>
-<pre><code>## Warning: package &#39;tidyr&#39; was built under R version 4.1.0</code></pre>
-<pre><code>## Warning: package &#39;readr&#39; was built under R version 4.1.0</code></pre>
-<pre><code>## Warning: package &#39;purrr&#39; was built under R version 4.1.0</code></pre>
-<pre><code>## Warning: package &#39;dplyr&#39; was built under R version 4.1.0</code></pre>
-<pre><code>## Warning: package &#39;stringr&#39; was built under R version 4.1.0</code></pre>
-<pre><code>## Warning: package &#39;forcats&#39; was built under R version 4.1.0</code></pre>
-<pre class="r"><code>library(infotheo)  # package with functions for calculating mutual information</code></pre>
-<pre><code>## Warning: package &#39;infotheo&#39; was built under R version 4.1.0</code></pre>
+<pre class="r"><code>library(tidyverse)
+library(infotheo)  # package with functions for calculating mutual information</code></pre>
 </div>
 <div id="import-the-data" class="section level2">
 <h2>Import the Data</h2>
@@ -408,7 +398,7 @@ seeds &lt;- sample(1:.Machine$integer.max, n_iter)</code></pre>
   geom_density() +
   geom_point(aes(y = -0.5), position = position_jitter(height=0.5)) +
   xlab(&quot;Mutual Information&quot;)</code></pre>
-<p><img src="c_01_minimising_mi_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="c_01_minimising_mi_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 <div id="step-4-find-the-best-stimulus-set" class="section level3">
 <h3><strong>Step 4</strong>: Find the best stimulus set</h3>
@@ -449,7 +439,7 @@ best_stim &lt;- slice_sample(stim_pool, n = 100)</code></pre>
   geom_point() +
   geom_smooth()</code></pre>
 <pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
-<p><img src="c_01_minimising_mi_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="c_01_minimising_mi_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 <p>We could use the faces in <code>best_stim</code> for our experiment, and be fairly sure that we’ve controlled for face width.</p>
 <p>For comparison, here is what the worst stimulus set looks like:</p>
 <pre class="r"><code># sort descendingly (highest mutual information first), and extract the top seed
@@ -467,7 +457,7 @@ ggplot(worst_stim, aes(age, face_width)) +
   geom_point() +
   geom_smooth()</code></pre>
 <pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
-<p><img src="c_01_minimising_mi_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="c_01_minimising_mi_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 </div>
 </div>
 
