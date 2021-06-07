@@ -16,7 +16,7 @@ Rather than needlessly dichotomise or bin your stimuli, you might want to look a
 
 Mutual information is a measure of how much information two variables have in common. If we minimise the mutual information between an independent variable (e.g., age) and a control variable (e.g., face width, face height), we can reduce the impact of the control variable on our outcome.
 
-I've just written one short example showing how you might minimise mutual information.
+Here's one short example showing how you might minimise mutual information.
 
 The code uses the `infotheo` package to calculate mutual information. You can install `infotheo` with:
 

@@ -21,7 +21,7 @@ This website contains materials associated with a workshop presented at the Soci
 
 ## Example Code
 
-This site contains some example R code for the methods covered in the workshop. For a briefer introduction with example code, you might want to try this blog post I wrote: [Item-Wise and Distribution-Wise Matching](https://jackedtaylor.github.io/2020/07/06/item-wise-and-distribution-wise-matching/).
+This site contains some example R code for the methods covered in the workshop. (For a briefer introduction, you might also be interested in [this blog post](https://jackedtaylor.github.io/2020/07/06/item-wise-and-distribution-wise-matching/)).
 
 The example code is split into three different approaches to generating stimuli:
 

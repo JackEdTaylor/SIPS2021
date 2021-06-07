@@ -14,9 +14,9 @@ When you match distribution-wise, you're controlling for confounding variables b
 
 <br>
 
-Here you can find some solutions to example problems. All the example code here uses the same dataset: [stim_pool.csv](dat/stim_pool.csv). The first two examples are simple cases, where you want to match two conditions on one numeric variable. The other examples show how you can adapt this to more complicated designs.
+Here you can find some example code. All the code here uses the same dataset: [stim_pool.csv](dat/stim_pool.csv). The first two examples are simple cases, where you want to match two conditions on one numeric variable. The other examples show how you can adapt this to more complicated designs.
 
-The K-S statistic can be calculated with the default R installation, but to calculate the overlapping index, you will probably want to install the package, `overlapping`:
+The K-S statistic can be calculated with the default R installation. To calculate the overlapping index, you will probably want to install the package, `overlapping`:
 
 ```{r, eval=FALSE}
 install.packages("overlapping")

@@ -14,7 +14,7 @@ When you match item-wise, you're finding items in each condition which are direc
 
 <br>
 
-Here you can find some solutions to example problems. All the example code here uses the same dataset: [stim_pool.csv](dat/stim_pool.csv). Most of the examples use LexOPS for simplicity, but the last example shows example code without LexOPS to better explain what's going on.
+Here you can find some example code for matching item-wise. All the code here uses the same dataset: [stim_pool.csv](dat/stim_pool.csv). Most of the examples use the package LexOPS for simplicity, but the last example shows example code without any packages to better explain what's going on.
 
 To use LexOPS in R, you will need to install it. You can do this with:
 
