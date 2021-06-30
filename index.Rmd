@@ -13,6 +13,10 @@ This website contains materials associated with a workshop presented at the Soci
 
 **Workshop Abstract**: Researchers often need to tightly control for confounding variables across conditions. Often, however, researchers are limited to using only a finite set of existing items. For example, you may be restricted to using a database of only a limited number of candidate words, or images of faces, or recordings of speech. Usually, people approach this problem by manually finding close matches on relevant dimensions. Manually crafting stimuli in this way is time-consuming and very difficult to do reproducibly. In this workshop, I'll show two solutions, using existing tools, for creating controlled stimuli reproducibly in R. The first solution uses an item-wise approach, creating directly comparable items in each condition. The second solution uses a distribution-wise approach, maximising the similarity in distributions across conditions. I’ll show how these two solutions are extremely flexible and can be applied to a range of different problems. Finally, I’ll discuss how using such an approach can aid reproducibility, replicability, and transparency of studies’ methods.
 
+<br>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/9ekGw_OwQqA" title="Session Recording" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## Slides
 
 `r fa(name = "file-powerpoint")` [Workshop slides in *.pptx* format](slides/designing_stimuli.pptx).
@@ -36,6 +40,14 @@ For readability, the code mostly uses [tidyverse](https://www.tidyverse.org/) pa
 All the code uses the same (made-up) dataset: [stim_pool.csv](dat/stim_pool.csv). If you have trouble downloading the csv, try downloading it in a zip: [stim_pool.zip](dat/stim_pool.zip). The csv is a simulated database of face images. All the example code generates lists of controlled stimuli for different imagined experimental designs.
 
 ## Other Useful Links
+
+* Paper on the Overlapping Index: [Pastore & Calcagni (2019)](http://doi.org/10.3389/fpsyg.2019.01089)
+
+* Paper on LexOPS: [Taylor et al. (2020)](https://doi.org/10.3758/s13428-020-01389-1)
+
+* Paper mentioned at 9:44 in the recording, about the problems with interpreting non-significant p values as evidence for a good match: [Sassenhagen & Alday (2016)](https://doi.org/10.1016/j.bandl.2016.08.001)
+
+* Related paper about how researchers can introduce spurious effects by hand-picking word stimuli: [Forster (2000)](https://doi.org/10.3758/bf03211812)
 
 * [SIPS 2021 Homepage](https://www.improvingpsych.org/SIPS2021/)
 
