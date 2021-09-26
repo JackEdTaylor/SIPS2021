@@ -1,5 +1,5 @@
 ---
-title: "03 - More than 2 Conditions"
+title: "05 - Factorial Designs"
 output:
   html_document:
     toc: true
@@ -28,7 +28,7 @@ library(LexOPS)  # package with functions for item-wise matching
 stim_pool <- read_csv("stim_pool.csv")
 ```
 
-# Matching >2 Conditions
+# Generating Stimuli for Factorial Designs
 
 ### **Step 1**: Find Matches
 

@@ -11,9 +11,9 @@
 
 
 
-<title>03 - More than 2 Conditions</title>
+<title>05 - Factorial Designs</title>
 
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -341,7 +341,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">03 - More than 2 Conditions</h1>
+<h1 class="title toc-ignore">05 - Factorial Designs</h1>
 
 </div>
 
@@ -359,8 +359,8 @@ library(LexOPS)  # package with functions for item-wise matching</code></pre>
 <pre class="r"><code>stim_pool &lt;- read_csv(&quot;stim_pool.csv&quot;)</code></pre>
 </div>
 </div>
-<div id="matching-2-conditions" class="section level1">
-<h1>Matching &gt;2 Conditions</h1>
+<div id="generating-stimuli-for-factorial-designs" class="section level1">
+<h1>Generating Stimuli for Factorial Designs</h1>
 <div id="step-1-find-matches" class="section level3">
 <h3><strong>Step 1</strong>: Find Matches</h3>
 <p>Here, we’ll create stimuli for a 3 (age: young, middle, old) x 2 (gender: female, male) design, controlling for face width and face length. To split by both independent variables, we can just call <code>split_by()</code> an additional time:</p>
@@ -387,12 +387,12 @@ Generated 55/100 (55%). 1328 total iterations, 0.04 success rate.
 Generated 60/100 (60%). 1438 total iterations, 0.04 success rate.
 Generated 65/100 (65%). 1521 total iterations, 0.04 success rate.
 Generated 70/100 (70%). 1708 total iterations, 0.04 success rate.
-Generated 75/100 (75%). 1878 total iterations, 0.04 success rate.
-Generated 80/100 (80%). 2027 total iterations, 0.04 success rate.
-Generated 85/100 (85%). 2120 total iterations, 0.04 success rate.
-Generated 90/100 (90%). 2216 total iterations, 0.04 success rate.
-Generated 95/100 (95%). 2410 total iterations, 0.04 success rate.
-Generated 100/100 (100%). 2671 total iterations, 0.04 success rate.</code></pre>
+Generated 75/100 (75%). 1845 total iterations, 0.04 success rate.
+Generated 80/100 (80%). 1987 total iterations, 0.04 success rate.
+Generated 85/100 (85%). 2056 total iterations, 0.04 success rate.
+Generated 90/100 (90%). 2211 total iterations, 0.04 success rate.
+Generated 95/100 (95%). 2341 total iterations, 0.04 success rate.
+Generated 100/100 (100%). 2467 total iterations, 0.04 success rate.</code></pre>
 <p>This gives us a list of matched sets of faces for six conditions:</p>
 <ul>
 <li>Young female faces (A1_B1)</li>

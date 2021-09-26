@@ -13,7 +13,7 @@
 
 <title>08 - Item-Wise Matching from Scratch</title>
 
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -443,16 +443,16 @@ match_df</code></pre>
 <pre><code>## # A tibble: 100 x 3
 ##    pair_nr young     old      
 ##      &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;    
-##  1       1 face_2398 face_1490
-##  2       2 face_169  face_4147
-##  3       3 face_1637 face_911 
-##  4       4 face_1656 face_3414
-##  5       5 face_2181 face_3664
-##  6       6 face_4674 face_295 
-##  7       7 face_553  face_1295
-##  8       8 face_1548 face_601 
-##  9       9 face_1982 face_2997
-## 10      10 face_1702 face_4455
+##  1       1 face_2355 face_1997
+##  2       2 face_4952 face_2646
+##  3       3 face_169  face_4147
+##  4       4 face_1637 face_911 
+##  5       5 face_1656 face_3414
+##  6       6 face_2181 face_3664
+##  7       7 face_4674 face_295 
+##  8       8 face_553  face_1295
+##  9       9 face_1548 face_601 
+## 10      10 face_1982 face_2997
 ## # ... with 90 more rows</code></pre>
 <p>We can add to this the face width values associated with each young and old item, and calculate the difference.</p>
 <pre class="r"><code>stim_pool_young &lt;- stim_pool %&gt;%
@@ -472,16 +472,16 @@ match_df</code></pre>
 <pre><code>## # A tibble: 100 x 6
 ##    pair_nr young     old       face_width_young face_width_old face_width_diff
 ##      &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;                &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;
-##  1       1 face_2398 face_1490             65.6           65.5           0.140
-##  2       2 face_169  face_4147             59.8           60.0          -0.180
-##  3       3 face_1637 face_911              63.2           63.6          -0.400
-##  4       4 face_1656 face_3414             68.2           68.4          -0.190
-##  5       5 face_2181 face_3664             61.6           61.8          -0.200
-##  6       6 face_4674 face_295              67.4           67             0.450
-##  7       7 face_553  face_1295             60.0           59.8           0.200
-##  8       8 face_1548 face_601              66.5           66.9          -0.410
-##  9       9 face_1982 face_2997             61.0           60.8           0.150
-## 10      10 face_1702 face_4455             60.4           60.7          -0.310
+##  1       1 face_2355 face_1997             62.6           62.7         -0.160 
+##  2       2 face_4952 face_2646             66.1           66.1          0.0600
+##  3       3 face_169  face_4147             59.8           60.0         -0.180 
+##  4       4 face_1637 face_911              63.2           63.6         -0.400 
+##  5       5 face_1656 face_3414             68.2           68.4         -0.190 
+##  6       6 face_2181 face_3664             61.6           61.8         -0.200 
+##  7       7 face_4674 face_295              67.4           67            0.450 
+##  8       8 face_553  face_1295             60.0           59.8          0.200 
+##  9       9 face_1548 face_601              66.5           66.9         -0.410 
+## 10      10 face_1982 face_2997             61.0           60.8          0.150 
 ## # ... with 90 more rows</code></pre>
 <p>Here is the distribution of differences between the young and old faces. Notice that they are between -0.5 and 0.5.</p>
 <pre class="r"><code>match_df %&gt;%
